@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Behavioral Response Analysis</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg app-shell">
+    <div class="orb orb-one"></div>
+    <div class="orb orb-three"></div>
+
+    <div class="card wide-card">
+        <div class="hero-row">
+            <div>
+                <span class="eyebrow">Behavioral Response Analysis System</span>
+                <h2>Session Dashboard</h2>
+                <p class="subtitle">A protected analytics platform for authenticity, mood, productivity, trends, and review-ready presentations.</p>
+            </div>
+            <button class="ghost-btn" onclick="logout()">Logout</button>
+        </div>
+
+        <div class="status-banner">
+            <div>
+                <strong id="welcomeName">Welcome</strong>
+                <p id="welcomeEmail">Loading user profile.</p>
+            </div>
+            <p class="status-copy">This platform estimates confidence, hesitation, and consistency from measurable interaction cues. It does not claim scientific lie detection.</p>
+        </div>
+
+        <div class="dashboard-grid">
+            <button class="module-card" onclick="go('lie')">
+                <span class="module-tag">Module 01</span>
+                <h3>Response Authenticity</h3>
+                <p>Difficulty levels, adaptive follow-up prompts, explainable scoring, and printable reports.</p>
+            </button>
+            <button class="module-card" onclick="go('mood')">
+                <span class="module-tag">Module 02</span>
+                <h3>Mood Mapping</h3>
+                <p>Track emotional state and connect it with confidence and hesitation changes.</p>
+            </button>
+            <button class="module-card" onclick="go('productivity')">
+                <span class="module-tag">Module 03</span>
+                <h3>Productivity Signals</h3>
+                <p>Measure focus, energy, distraction load, and their relationship with response quality.</p>
+            </button>
+            <button class="module-card" onclick="go('history')">
+                <span class="module-tag">Module 04</span>
+                <h3>Insight Console</h3>
+                <p>Use filters, comparison, risk heatmaps, recommendations, and benchmark views.</p>
+            </button>
+            <button class="module-card" onclick="go('profile')">
+                <span class="module-tag">Module 05</span>
+                <h3>User Profile</h3>
+                <p>View your baseline, recent sessions, recommendations, and personal benchmark summary.</p>
+            </button>
+            <button class="module-card" onclick="go('presentation')">
+                <span class="module-tag">Module 06</span>
+                <h3>Presentation Mode</h3>
+                <p>Open a polished demo screen with live-ready analytics for guide reviews and viva.</p>
+            </button>
+            <button class="module-card" id="adminCard" onclick="go('admin')" style="display:none;">
+                <span class="module-tag">Admin</span>
+                <h3>Admin Console</h3>
+                <p>Inspect user metrics, platform-wide activity, module performance, and flagged sessions.</p>
+            </button>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        const currentUser = requireAuth();
+        if (currentUser) {
+            startSessionWatch();
+            document.getElementById("welcomeName").textContent = `Welcome, ${currentUser.name}`;
+            document.getElementById("welcomeEmail").textContent = `${currentUser.email}${currentUser.isAdmin ? " | Admin access enabled" : ""}`;
+            if (currentUser.isAdmin) {
+                document.getElementById("adminCard").style.display = "block";
+            }
+        }
+
+        function go(type) {
+            if (type === "lie") window.location = "lie.html";
+            if (type === "mood") window.location = "mood.html";
+            if (type === "productivity") window.location = "productivity.html";
+            if (type === "history") window.location = "history.html";
+            if (type === "profile") window.location = "profile.html";
+            if (type === "presentation") window.location = "presentation.html";
+            if (type === "admin") window.location = "admin.html";
+        }
+    </script>
+</body>
+</html>

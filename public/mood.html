@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mood Mapping - Behavioral Response Analysis</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg">
+    <div class="card wide-card">
+        <div class="hero-row">
+            <div>
+                <span class="eyebrow">Module 02</span>
+                <h2>Mood Mapping</h2>
+                <p class="subtitle">Capture the emotional tone behind your sessions and compare it with confidence patterns.</p>
+            </div>
+            <button class="ghost-btn" onclick="window.location='dashboard.html'">Back</button>
+        </div>
+
+        <div id="moodQuestions" class="stacked-question-list"></div>
+        <button onclick="submitMood()">Analyze mood profile</button>
+
+        <div id="moodResult" class="result-container" style="display:none;">
+            <div class="metrics-grid" id="moodMetrics"></div>
+            <canvas id="moodChart" class="result-chart"></canvas>
+            <div id="moodSummary"></div>
+            <button class="ghost-btn" onclick="printMoodReport()">Print or save as PDF</button>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        const currentUser = requireAuth();
+        if (currentUser) startSessionWatch();
+
+        const moodQuestions = [
+            "How do you feel before answering personal questions?",
+            "What best describes your current energy state?",
+            "How emotionally stable do you feel today?"
+        ];
+
+        const options = [
+            { value: "happy", label: "Happy" },
+            { value: "calm", label: "Calm" },
+            { value: "focused", label: "Focused" },
+            { value: "tired", label: "Tired" },
+            { value: "stressed", label: "Stressed" },
+            { value: "sad", label: "Sad" },
+            { value: "angry", label: "Angry" }
+        ];
+
+        const responseState = moodQuestions.map(() => ({ answer: "", changed: false }));
+        const container = document.getElementById("moodQuestions");
+        let latestMoodResult = null;
+        let moodChart;
+
+        moodQuestions.forEach((question, index) => {
+            const block = document.createElement("div");
+            block.className = "question-block";
+            block.innerHTML = `
+                <h3>${question}</h3>
+                <div class="option-grid">
+                    ${options.map((option) => `
+                        <button type="button" class="chip-btn" data-index="${index}" data-value="${option.value}">
+                            ${option.label}
+                        </button>
+                    `).join("")}
+                </div>
+            `;
+            container.appendChild(block);
+        });
+
+        container.addEventListener("click", (event) => {
+            const target = event.target.closest(".chip-btn");
+            if (!target) return;
+            const index = Number(target.dataset.index);
+            const value = target.dataset.value;
+            if (responseState[index].answer && responseState[index].answer !== value) {
+                responseState[index].changed = true;
+            }
+            responseState[index].answer = value;
+            document.querySelectorAll(`.chip-btn[data-index="${index}"]`).forEach((button) => button.classList.remove("selected-chip"));
+            target.classList.add("selected-chip");
+        });
+
+        async function submitMood() {
+            if (responseState.some((item) => !item.answer)) {
+                alert("Please answer all mood prompts.");
+                return;
+            }
+
+            const payload = responseState.map((item, index) => ({
+                question: moodQuestions[index],
+                answer: item.answer,
+                changed: item.changed
+            }));
+
+            const response = await authFetch("/mood-analyze", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ responses: payload })
+            });
+            const data = await response.json();
+            latestMoodResult = data;
+
+            document.getElementById("moodResult").style.display = "block";
+            document.getElementById("moodMetrics").innerHTML = `
+                <div class="metric-card"><span>Emotional score</span><strong>${data.score}%</strong></div>
+                <div class="metric-card"><span>Confidence</span><strong>${data.confidence}%</strong></div>
+                <div class="metric-card"><span>Hesitation risk</span><strong>${data.hesitation}%</strong></div>
+                <div class="metric-card"><span>Profile</span><strong>${data.label}</strong></div>
+            `;
+            document.getElementById("moodSummary").innerHTML = `<p class="feedback">${data.summary}</p>`;
+
+            if (moodChart) moodChart.destroy();
+            moodChart = new Chart(document.getElementById("moodChart"), {
+                type: "radar",
+                data: {
+                    labels: ["Score", "Confidence", "Calmness", "Stability"],
+                    datasets: [{
+                        label: "Mood profile",
+                        data: [data.score, data.confidence, 100 - data.hesitation, data.consistency],
+                        backgroundColor: "rgba(24, 179, 255, 0.2)",
+                        borderColor: "#22c1ff",
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    scales: {
+                        r: {
+                            angleLines: { color: "rgba(255,255,255,0.15)" },
+                            grid: { color: "rgba(255,255,255,0.15)" },
+                            pointLabels: { color: "#dceeff" },
+                            ticks: { backdropColor: "transparent", color: "#9bc6e6" },
+                            suggestedMin: 0,
+                            suggestedMax: 100
+                        }
+                    },
+                    plugins: { legend: { labels: { color: "#dceeff" } } }
+                }
+            });
+        }
+
+        function printMoodReport() {
+            if (!latestMoodResult) return;
+            openPrintableReport("Mood Mapping Report", [
+                { title: "Profile", body: `<div class="card">${latestMoodResult.label}</div>` },
+                { title: "Summary", body: `<div class="card">${latestMoodResult.summary}</div>` },
+                {
+                    title: "Metrics",
+                    body: `<div class="grid">
+                        <div class="card">Score: ${latestMoodResult.score}%</div>
+                        <div class="card">Confidence: ${latestMoodResult.confidence}%</div>
+                        <div class="card">Hesitation: ${latestMoodResult.hesitation}%</div>
+                        <div class="card">Consistency: ${latestMoodResult.consistency}%</div>
+                    </div>`
+                }
+            ]);
+        }
+    </script>
+</body>
+</html>

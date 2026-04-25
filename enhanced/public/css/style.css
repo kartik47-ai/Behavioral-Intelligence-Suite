@@ -1,0 +1,20 @@
+*{box-sizing:border-box;margin:0;padding:0;font-family:Segoe UI,sans-serif;}
+body{min-height:100vh;display:flex;justify-content:center;align-items:center;background:#06132c;color:#eaf6ff;padding:16px;}
+.card{width:min(90vw,580px);padding:24px;border-radius:18px;background:linear-gradient(160deg,rgba(8,24,54,.95),rgba(10,20,42,.98));border:1px solid rgba(60,160,255,.45);box-shadow:0 12px 34px rgba(0,0,0,.45);}
+.lie-detector-card h2{color:#b8e7ff;text-align:center;margin-bottom:8px;}
+.subtitle{color:#78d7ff;text-align:center;margin-bottom:20px;font-size:.95rem;}
+.progress-bar{height:8px;width:100%;background:rgba(28,57,96,.6);border-radius:999px;margin-bottom:18px;overflow:hidden;}
+.progress-bar div{height:100%;background:linear-gradient(90deg,#2cfaff,#2b80ff);width:0;transition:width .4s ease;}
+.answer-options{display:flex;gap:10px;margin:15px 0;}
+.answer-btn{flex:1;padding:12px 10px;border:2px solid #40c6ff;border-radius:12px;background:rgba(6,25,60,.85);color:#d5f8ff;font-size:1.02rem;cursor:pointer;transition:.2s;}
+.answer-btn:hover{background:rgba(18,92,171,.8);}
+.answer-btn.selected{background:linear-gradient(92deg,#33ccff,#2f8ed8);color:#fff;}
+.confirm-btn{width:100%;padding:12px;border:none;border-radius:12px;background:linear-gradient(92deg,#1db3ff,#0f7de5);color:#fff;font-weight:700;cursor:pointer;}
+.confirm-btn:hover{transform:scale(1.02);}
+.question-feedback{position:relative;text-align:center;min-height:30px;font-size:14px;margin-top:10px;color:#54befb;opacity:0;visibility:hidden;transition:.25s;}
+.question-feedback.visible{opacity:1;visibility:visible;}
+.live-meter-container{margin:14px 0;text-align:center;}
+.live-meter-bar{height:10px;background:rgba(26,56,95,.5);border-radius:999px;overflow:hidden;}
+.live-meter-fill{height:100%;width:100%;background:linear-gradient(90deg,#4fdcff,#1a6aff);transition:.25s;}
+.live-truth-value{margin-top:4px;color:#9fe9ff;font-weight:700;}
+.result-container{margin-top:16px;padding:12px;border:1px dashed rgba(73,147,255,.65);border-radius:10px;background:rgba(2,16,39,.6);}

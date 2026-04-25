@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Console - Behavioral Response Analysis</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg">
+    <div class="card wide-card">
+        <div class="hero-row">
+            <div>
+                <span class="eyebrow">Admin Console</span>
+                <h2>Platform Overview</h2>
+                <p class="subtitle">Inspect user activity, platform averages, flagged sessions, and the global risk heatmap.</p>
+            </div>
+            <button class="ghost-btn" onclick="window.location='dashboard.html'">Back</button>
+        </div>
+
+        <div class="metrics-grid" id="adminMetrics"></div>
+
+        <div class="chart-grid">
+            <div class="panel">
+                <h3>Platform heatmap</h3>
+                <div id="adminHeatmap" class="heatmap-grid"></div>
+            </div>
+            <div class="panel">
+                <h3>Module averages</h3>
+                <canvas id="adminChart"></canvas>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h3>User list</h3>
+            <div id="userList" class="session-list"></div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        const currentUser = requireAuth();
+        if (!currentUser?.isAdmin) {
+            window.location = "dashboard.html";
+        } else {
+            startSessionWatch();
+        }
+
+        let adminChart;
+
+        async function loadAdmin() {
+            const [overviewRes, usersRes] = await Promise.all([
+                authFetch("/admin/overview"),
+                authFetch("/admin/users")
+            ]);
+
+            const overview = await overviewRes.json();
+            const users = await usersRes.json();
+
+            document.getElementById("adminMetrics").innerHTML = `
+                <div class="metric-card"><span>Users</span><strong>${overview.totals.users}</strong></div>
+                <div class="metric-card"><span>Active users</span><strong>${overview.totals.activeUsers}</strong></div>
+                <div class="metric-card"><span>Sessions</span><strong>${overview.totals.sessions}</strong></div>
+                <div class="metric-card"><span>Flagged sessions</span><strong>${overview.totals.flaggedSessions}</strong></div>
+            `;
+
+            document.getElementById("adminHeatmap").innerHTML = overview.heatmap.length
+                ? overview.heatmap.map((item) => `<div class="heat-cell"><span>${item.category}</span><strong>${item.risk}%</strong></div>`).join("")
+                : `<div class="list-item">No heatmap available.</div>`;
+
+            const moduleLabels = Object.keys(overview.moduleAverages).map((item) => item);
+            const moduleScores = Object.values(overview.moduleAverages).map((item) => item.score);
+
+            if (adminChart) adminChart.destroy();
+            adminChart = new Chart(document.getElementById("adminChart"), {
+                type: "bar",
+                data: {
+                    labels: moduleLabels,
+                    datasets: [{
+                        data: moduleScores,
+                        backgroundColor: ["#29c6ff", "#18d39b", "#ffb347"]
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: { color: "#dceeff" },
+                            grid: { color: "rgba(255,255,255,0.12)" }
+                        },
+                        x: {
+                            ticks: { color: "#dceeff" },
+                            grid: { display: false }
+                        }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+
+            document.getElementById("userList").innerHTML = users.length
+                ? users.map((user) => `
+                    <div class="session-item">
+                        <div class="session-head">
+                            <strong>${user.name}</strong>
+                            <span>${user.email}</span>
+                        </div>
+                        <div class="session-tags">
+                            <span>Sessions ${user.sessions}</span>
+                            <span>Avg score ${user.avgScore}%</span>
+                            <span>Avg confidence ${user.avgConfidence}%</span>
+                            <span>${user.isAdmin ? "Admin" : "User"}</span>
+                        </div>
+                    </div>
+                `).join("")
+                : `<div class="list-item">No users found.</div>`;
+        }
+
+        loadAdmin();
+    </script>
+</body>
+</html>

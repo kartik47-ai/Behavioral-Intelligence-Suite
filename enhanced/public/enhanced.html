@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Enhanced Lie Detector</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg">
+  <div class="card lie-detector-card">
+    <h2>🚀 Enhanced Adaptive Lie Detector</h2>
+    <p class="subtitle">Every session -> smart new questions</p>
+
+    <div class="progress-bar"><div id="progressFill"></div></div>
+    <h3 id="q"></h3>
+    <p id="qcount"></p>
+
+    <div class="answer-options" id="answerOptions">
+      <button class="answer-btn" id="yesBtn">✓ YES</button>
+      <button class="answer-btn" id="noBtn">✗ NO</button>
+    </div>
+
+    <div id="questionFeedback" class="question-feedback"></div>
+
+    <button class="confirm-btn" id="nextBtn">→ Next Question</button>
+
+    <div class="live-meter-container">
+      <div class="live-meter-label">Live Auth Score</div>
+      <div class="live-meter-bar"><div id="liveMeter" class="live-meter-fill"></div></div>
+      <div id="liveTruth" class="live-truth-value">100%</div>
+    </div>
+
+    <canvas id="chart" class="result-chart"></canvas>
+    <div id="resultContainer" class="result-container" style="display:none;"></div>
+  </div>
+
+<script src="js/main.js"></script>
+</body>
+</html>

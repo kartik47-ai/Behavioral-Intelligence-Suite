@@ -1,0 +1,13 @@
+{
+  "name": "digital-lie-detector-enhanced",
+  "version": "1.0.0",
+  "description": "Enhanced seat for lie-detector with adaptive flow",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^6.0.1"
+  }
+}

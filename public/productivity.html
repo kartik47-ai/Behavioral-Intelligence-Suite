@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Productivity Signals - Behavioral Response Analysis</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg">
+    <div class="card wide-card">
+        <div class="hero-row">
+            <div>
+                <span class="eyebrow">Module 03</span>
+                <h2>Productivity Signals</h2>
+                <p class="subtitle">Measure the focus conditions that may influence response confidence on a given day.</p>
+            </div>
+            <button class="ghost-btn" onclick="window.location='dashboard.html'">Back</button>
+        </div>
+
+        <div class="form-grid">
+            <label>Hours worked or studied
+                <input id="hours" type="number" min="0" max="24" placeholder="Enter hours">
+            </label>
+            <label>Focus level (1-10)
+                <input id="focus" type="number" min="1" max="10" placeholder="Enter focus">
+            </label>
+            <label>Energy level (1-10)
+                <input id="energy" type="number" min="1" max="10" placeholder="Enter energy">
+            </label>
+            <label>Distractions (0-10)
+                <input id="distractions" type="number" min="0" max="10" placeholder="Enter distractions">
+            </label>
+        </div>
+
+        <button onclick="submitProductivity()">Analyze productivity</button>
+
+        <div id="productivityResult" class="result-container" style="display:none;">
+            <div class="metrics-grid" id="productivityMetrics"></div>
+            <canvas id="productivityChart" class="result-chart"></canvas>
+            <div id="productivitySummary"></div>
+            <button class="ghost-btn" onclick="printProductivityReport()">Print or save as PDF</button>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        const currentUser = requireAuth();
+        if (currentUser) startSessionWatch();
+
+        let latestResult = null;
+        let productivityChart;
+
+        async function submitProductivity() {
+            const payload = {
+                hours: Number(document.getElementById("hours").value),
+                focus: Number(document.getElementById("focus").value),
+                energy: Number(document.getElementById("energy").value),
+                distractions: Number(document.getElementById("distractions").value)
+            };
+
+            if (!Number.isFinite(payload.hours) || !Number.isFinite(payload.focus) || !Number.isFinite(payload.energy) || !Number.isFinite(payload.distractions)) {
+                alert("Please complete all productivity inputs.");
+                return;
+            }
+
+            const response = await authFetch("/productivity-analyze", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+            const data = await response.json();
+            latestResult = data;
+
+            document.getElementById("productivityResult").style.display = "block";
+            document.getElementById("productivityMetrics").innerHTML = `
+                <div class="metric-card"><span>Productivity score</span><strong>${data.score}%</strong></div>
+                <div class="metric-card"><span>Confidence</span><strong>${data.confidence}%</strong></div>
+                <div class="metric-card"><span>Distraction risk</span><strong>${data.hesitation}%</strong></div>
+                <div class="metric-card"><span>Consistency</span><strong>${data.consistency}%</strong></div>
+            `;
+            document.getElementById("productivitySummary").innerHTML = `<p class="feedback">${data.summary}</p>`;
+
+            if (productivityChart) productivityChart.destroy();
+            productivityChart = new Chart(document.getElementById("productivityChart"), {
+                type: "bar",
+                data: {
+                    labels: ["Productivity", "Confidence", "Focus reserve", "Consistency"],
+                    datasets: [{
+                        label: "Daily signals",
+                        data: [data.score, data.confidence, 100 - data.hesitation, data.consistency],
+                        backgroundColor: ["#23c4ff", "#0dd0a2", "#ffb648", "#4b86ff"]
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: { color: "#dceeff" },
+                            grid: { color: "rgba(255,255,255,0.12)" }
+                        },
+                        x: {
+                            ticks: { color: "#dceeff" },
+                            grid: { display: false }
+                        }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        function printProductivityReport() {
+            if (!latestResult) return;
+            openPrintableReport("Productivity Signals Report", [
+                { title: "Summary", body: `<div class="card">${latestResult.summary}</div>` },
+                {
+                    title: "Metrics",
+                    body: `<div class="grid">
+                        <div class="card">Productivity: ${latestResult.score}%</div>
+                        <div class="card">Confidence: ${latestResult.confidence}%</div>
+                        <div class="card">Hesitation: ${latestResult.hesitation}%</div>
+                        <div class="card">Consistency: ${latestResult.consistency}%</div>
+                    </div>`
+                }
+            ]);
+        }
+    </script>
+</body>
+</html>
