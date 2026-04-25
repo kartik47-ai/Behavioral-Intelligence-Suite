@@ -4,4 +4,6 @@ A responsive web-based lie detector app that combines front-end dashboards, user
 ## UI Prototype
 Review the polished user interface concept in the linked prototype below. It highlights the app's dashboard layout, analytics workflows, and visual design for a professional and intuitive experience.
 
-- [Behavioral Response Analysis System UI Prototype](Behavioral-Response-Analysis-UI.pdf)
+- [View the UI Prototype PDF](./Behavioral-Response-Analysis-UI.pdf)
+
+> Note: GitHub opens PDFs in its built-in preview viewer when you click the link. The PDF may not display directly inside the README page itself, but it will open in the repository preview.
