@@ -3,74 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Response Authenticity Analyzer</title>
+    <title>Authenticity Lab | VeraLens</title>
     <link rel="stylesheet" href="css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="bg">
-    <div class="orb orb-two"></div>
-    <div class="orb orb-three"></div>
-
-    <div class="card wide-card lie-detector-card">
-        <div class="hero-row">
-            <div>
-                <span class="eyebrow">Module 01</span>
-                <h2>Response Authenticity Analyzer</h2>
-                <p class="subtitle">Adaptive, difficulty-aware assessment using timing, hesitation, consistency, and category risk.</p>
-            </div>
-            <button class="ghost-btn" onclick="window.location='dashboard.html'">Back</button>
-        </div>
-
-        <div class="toolbar">
-            <select id="difficultySelect">
-                <option value="easy">Easy baseline</option>
-                <option value="standard" selected>Standard</option>
-                <option value="high-pressure">High pressure</option>
-            </select>
-            <button class="ghost-btn" onclick="restartSession()">Restart session</button>
-        </div>
-
-        <div class="live-meter-container">
-            <div class="live-meter-label">Live confidence signal</div>
-            <div class="live-meter-bar">
-                <div id="liveMeter" class="live-meter-fill"></div>
-            </div>
-            <div id="liveTruth" class="live-truth-value">100%</div>
-            <div id="liveAnalysis" class="live-analysis-text">Calibration in progress.</div>
-        </div>
-
-        <div class="question-container">
-            <div class="question-content full-width">
-                <div class="progress-bar">
-                    <div class="progress-fill" id="progressFill"></div>
+    <div class="page-shell">
+        <main class="main-shell wide-card" style="margin: 0 auto;">
+            <section class="topbar">
+                <div>
+                    <span class="eyebrow">Module 01</span>
+                    <h2>Authenticity Lab</h2>
+                    <p class="subtitle">A calibrated response assessment with live signal tracking, adaptive follow-up prompts, and explainable scoring.</p>
                 </div>
-                <p class="question-count" id="qcount"></p>
-                <h3 id="q" class="question-text"></h3>
-                <p class="mini-copy" id="qCategory"></p>
-            </div>
-        </div>
+                <div class="split-actions">
+                    <button class="ghost-btn" onclick="navigateTo('dashboard')">Back to dashboard</button>
+                    <button class="ghost-btn" onclick="restartSession()">Restart session</button>
+                </div>
+            </section>
 
-        <div class="answer-options" id="answerOptions">
-            <button class="answer-btn" onclick="selectAnswer('yes', event)">Yes</button>
-            <button class="answer-btn" onclick="selectAnswer('no', event)">No</button>
-        </div>
+            <section class="hero-panel">
+                <div class="hero-row">
+                    <div class="hero-content">
+                        <span class="eyebrow">Assessment Controls</span>
+                        <h3>Choose the pressure level for this session.</h3>
+                        <p class="muted-copy">Easy helps establish a baseline, standard balances clarity and challenge, and high pressure is designed to increase friction and reveal hesitation markers.</p>
+                    </div>
+                    <div style="min-width: 240px;">
+                        <select id="difficultySelect">
+                            <option value="easy">Easy baseline</option>
+                            <option value="standard" selected>Standard session</option>
+                            <option value="high-pressure">High pressure</option>
+                        </select>
+                    </div>
+                </div>
+            </section>
 
-        <div id="questionFeedback" class="question-feedback"></div>
-        <button class="confirm-btn" onclick="confirmAnswer()">Next question</button>
+            <section class="summary-grid">
+                <div class="live-meter-container">
+                    <div class="live-meter-label">Live confidence signal</div>
+                    <div class="live-meter-bar">
+                        <div id="liveMeter" class="live-meter-fill"></div>
+                    </div>
+                    <div id="liveTruth" class="live-truth-value">100%</div>
+                    <div id="liveAnalysis" class="mini-copy">Calibration in progress.</div>
+                </div>
 
-        <div class="timer-section">
-            <h3 id="timer" class="timer-text"></h3>
-        </div>
+                <div class="panel">
+                    <span class="eyebrow">Session Notes</span>
+                    <h3>Professional framing</h3>
+                    <p class="muted-copy">This module estimates authenticity-related response stability. It should be interpreted as behavioral analysis support, not definitive truth verification.</p>
+                    <div class="pill-row" style="margin-top: 16px;">
+                        <span class="insight-pill insight-success">Adaptive prompts</span>
+                        <span class="insight-pill insight-warning">Timing analysis</span>
+                        <span class="insight-pill">Explainable report</span>
+                    </div>
+                </div>
+            </section>
 
-        <div id="resultContainer" class="result-container" style="display:none;">
-            <div class="metrics-grid" id="metricCards"></div>
-            <canvas id="chart" class="result-chart"></canvas>
-            <div id="resultText"></div>
-            <div class="toolbar">
-                <button class="ghost-btn" onclick="downloadReport()">Download JSON report</button>
-                <button class="ghost-btn" onclick="printReport()">Print or save as PDF</button>
-            </div>
-        </div>
+            <section class="module-stage">
+                <div class="question-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <p class="question-count" id="qcount"></p>
+                    <h3 id="q" class="question-text"></h3>
+                    <p class="mini-copy" id="qCategory"></p>
+                </div>
+
+                <div class="answer-panel">
+                    <div class="answer-options" id="answerOptions">
+                        <button class="answer-btn" onclick="selectAnswer('yes', event)">Yes</button>
+                        <button class="answer-btn" onclick="selectAnswer('no', event)">No</button>
+                    </div>
+                    <div id="questionFeedback" class="question-feedback"></div>
+                    <div class="split-row" style="margin-top: 16px;">
+                        <button class="confirm-btn" onclick="confirmAnswer()">Confirm and continue</button>
+                        <h3 id="timer" class="timer-text"></h3>
+                    </div>
+                </div>
+            </section>
+
+            <section id="resultContainer" class="result-container" style="display:none;">
+                <div class="panel-head">
+                    <div>
+                        <span class="eyebrow">Session Report</span>
+                        <h3>Explainable result summary</h3>
+                    </div>
+                    <div class="split-actions">
+                        <button class="ghost-btn" onclick="downloadReport()">Download JSON report</button>
+                        <button class="ghost-btn" onclick="printReport()">Print or save as PDF</button>
+                    </div>
+                </div>
+                <div class="metrics-grid" id="metricCards"></div>
+                <div class="panel chart-panel" style="margin-top: 18px;">
+                    <canvas id="chart" class="result-chart"></canvas>
+                </div>
+                <div id="resultText"></div>
+            </section>
+        </main>
     </div>
 
     <script src="js/app.js"></script>

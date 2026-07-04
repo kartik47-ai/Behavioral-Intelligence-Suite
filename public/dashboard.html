@@ -3,91 +3,172 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Behavioral Response Analysis</title>
+    <title>Dashboard | VeraLens Behavioral Intelligence</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
-<body class="bg app-shell">
-    <div class="orb orb-one"></div>
-    <div class="orb orb-three"></div>
+<body class="bg">
+    <div class="page-shell">
+        <div class="dashboard-layout">
+            <aside class="sidebar">
+                <div class="sidebar-brand">
+                    <div class="brand-mark">V</div>
+                    <div class="brand-title">VeraLens</div>
+                    <p class="sidebar-copy">Behavioral intelligence workspace for calibrated sessions, explainable scoring, and review-ready reporting.</p>
+                </div>
 
-    <div class="card wide-card">
-        <div class="hero-row">
-            <div>
-                <span class="eyebrow">Behavioral Response Analysis System</span>
-                <h2>Session Dashboard</h2>
-                <p class="subtitle">A protected analytics platform for authenticity, mood, productivity, trends, and review-ready presentations.</p>
-            </div>
-            <button class="ghost-btn" onclick="logout()">Logout</button>
-        </div>
+                <nav class="nav-list">
+                    <button class="nav-link active" onclick="navigateTo('dashboard')">
+                        <span>Command Center<small>Overview and launchpad</small></span>
+                    </button>
+                    <button class="nav-link" onclick="navigateTo('lie')">
+                        <span>Authenticity Lab<small>Adaptive assessment flow</small></span>
+                    </button>
+                    <button class="nav-link" onclick="navigateTo('mood')">
+                        <span>Mood Mapping<small>Emotional context module</small></span>
+                    </button>
+                    <button class="nav-link" onclick="navigateTo('productivity')">
+                        <span>Productivity Signals<small>Focus and output signals</small></span>
+                    </button>
+                    <button class="nav-link" onclick="navigateTo('history')">
+                        <span>Insight Console<small>Trends, comparison, and risk</small></span>
+                    </button>
+                    <button class="nav-link" onclick="navigateTo('profile')">
+                        <span>Profile Intelligence<small>Personal baseline and progress</small></span>
+                    </button>
+                    <button class="nav-link" onclick="navigateTo('presentation')">
+                        <span>Presentation Mode<small>Demo and review storytelling</small></span>
+                    </button>
+                    <button class="nav-link" id="adminNav" onclick="navigateTo('admin')" style="display:none;">
+                        <span>Admin Console<small>Platform-wide oversight</small></span>
+                    </button>
+                </nav>
 
-        <div class="status-banner">
-            <div>
-                <strong id="welcomeName">Welcome</strong>
-                <p id="welcomeEmail">Loading user profile.</p>
-            </div>
-            <p class="status-copy">This platform estimates confidence, hesitation, and consistency from measurable interaction cues. It does not claim scientific lie detection.</p>
-        </div>
+                <div class="sidebar-footer">
+                    <button class="ghost-btn" onclick="logout()">Sign out</button>
+                </div>
+            </aside>
 
-        <div class="dashboard-grid">
-            <button class="module-card" onclick="go('lie')">
-                <span class="module-tag">Module 01</span>
-                <h3>Response Authenticity</h3>
-                <p>Difficulty levels, adaptive follow-up prompts, explainable scoring, and printable reports.</p>
-            </button>
-            <button class="module-card" onclick="go('mood')">
-                <span class="module-tag">Module 02</span>
-                <h3>Mood Mapping</h3>
-                <p>Track emotional state and connect it with confidence and hesitation changes.</p>
-            </button>
-            <button class="module-card" onclick="go('productivity')">
-                <span class="module-tag">Module 03</span>
-                <h3>Productivity Signals</h3>
-                <p>Measure focus, energy, distraction load, and their relationship with response quality.</p>
-            </button>
-            <button class="module-card" onclick="go('history')">
-                <span class="module-tag">Module 04</span>
-                <h3>Insight Console</h3>
-                <p>Use filters, comparison, risk heatmaps, recommendations, and benchmark views.</p>
-            </button>
-            <button class="module-card" onclick="go('profile')">
-                <span class="module-tag">Module 05</span>
-                <h3>User Profile</h3>
-                <p>View your baseline, recent sessions, recommendations, and personal benchmark summary.</p>
-            </button>
-            <button class="module-card" onclick="go('presentation')">
-                <span class="module-tag">Module 06</span>
-                <h3>Presentation Mode</h3>
-                <p>Open a polished demo screen with live-ready analytics for guide reviews and viva.</p>
-            </button>
-            <button class="module-card" id="adminCard" onclick="go('admin')" style="display:none;">
-                <span class="module-tag">Admin</span>
-                <h3>Admin Console</h3>
-                <p>Inspect user metrics, platform-wide activity, module performance, and flagged sessions.</p>
-            </button>
+            <main class="main-shell">
+                <section class="topbar">
+                    <div>
+                        <span class="eyebrow">Control Center</span>
+                        <h3 id="welcomeName">Loading workspace</h3>
+                        <p class="muted-copy" id="welcomeEmail">Authenticating your session.</p>
+                    </div>
+                    <div class="quick-actions">
+                        <button class="ghost-btn" onclick="navigateTo('presentation')">Open presentation mode</button>
+                        <button onclick="navigateTo('lie')">Start live session</button>
+                    </div>
+                </section>
+
+                <section class="hero-panel">
+                    <div class="hero-row">
+                        <div class="hero-content">
+                            <span class="eyebrow">Behavioral Analysis Platform</span>
+                            <h2>Professional behavioral insight, structured for decision-making.</h2>
+                            <p class="subtitle">The platform estimates confidence, hesitation, and consistency from measurable interaction cues and surrounding context. It is positioned as a behavioral analyzer, not a scientific lie detector.</p>
+                        </div>
+                        <div class="pill-row">
+                            <span class="hero-stat">Explainable metrics</span>
+                            <span class="hero-stat">Personal baseline tracking</span>
+                            <span class="hero-stat">Role-aware admin intelligence</span>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="status-banner">
+                    <div>
+                        <div class="split-row">
+                            <span class="status-dot"></span>
+                            <strong>Secure session active</strong>
+                        </div>
+                        <p class="mini-copy">Use the command center to launch modules, review historical evidence, and prepare cleaner output for demos or evaluations.</p>
+                    </div>
+                    <div class="split-actions">
+                        <button class="ghost-btn" onclick="navigateTo('history')">Review trends</button>
+                        <button class="ghost-btn" onclick="navigateTo('profile')">Open profile intelligence</button>
+                    </div>
+                </section>
+
+                <section class="metrics-grid" id="dashboardMetrics">
+                    <article class="metric-card">
+                        <span>Session status</span>
+                        <strong>Ready</strong>
+                        <p>Loading your personalized overview.</p>
+                    </article>
+                </section>
+
+                <section class="module-grid">
+                    <button class="module-card" onclick="navigateTo('lie')">
+                        <span class="module-tag">Module 01</span>
+                        <h3>Authenticity Lab</h3>
+                        <p>Difficulty-aware questioning, adaptive follow-ups, live signal tracking, and explainable post-session scoring.</p>
+                    </button>
+                    <button class="module-card" onclick="navigateTo('mood')">
+                        <span class="module-tag">Module 02</span>
+                        <h3>Mood Mapping</h3>
+                        <p>Capture emotional context and compare calmness, strain, and consistency against response quality.</p>
+                    </button>
+                    <button class="module-card" onclick="navigateTo('productivity')">
+                        <span class="module-tag">Module 03</span>
+                        <h3>Productivity Signals</h3>
+                        <p>Track focus, energy, and distraction load to understand the conditions surrounding each session.</p>
+                    </button>
+                    <button class="module-card" onclick="navigateTo('history')">
+                        <span class="module-tag">Module 04</span>
+                        <h3>Insight Console</h3>
+                        <p>Explore historical sessions, compare records, scan risk heatmaps, and prepare benchmark-driven summaries.</p>
+                    </button>
+                    <button class="module-card" onclick="navigateTo('profile')">
+                        <span class="module-tag">Module 05</span>
+                        <h3>Profile Intelligence</h3>
+                        <p>View personal baselines, weekly activity, standout moments, and recommendation tracks.</p>
+                    </button>
+                    <button class="module-card" onclick="navigateTo('presentation')">
+                        <span class="module-tag">Module 06</span>
+                        <h3>Presentation Mode</h3>
+                        <p>Switch to a cleaner storytelling surface for demos, stakeholder walkthroughs, and viva presentations.</p>
+                    </button>
+                    <button class="module-card" id="adminCard" onclick="navigateTo('admin')" style="display:none;">
+                        <span class="module-tag">Admin</span>
+                        <h3>Admin Console</h3>
+                        <p>Inspect the platform baseline, active users, flagged sessions, risk distribution, and global intelligence patterns.</p>
+                    </button>
+                </section>
+            </main>
         </div>
     </div>
 
     <script src="js/app.js"></script>
     <script>
         const currentUser = requireAuth();
+
         if (currentUser) {
             startSessionWatch();
-            document.getElementById("welcomeName").textContent = `Welcome, ${currentUser.name}`;
+            document.getElementById("welcomeName").textContent = `${currentUser.name}'s command center`;
             document.getElementById("welcomeEmail").textContent = `${currentUser.email}${currentUser.isAdmin ? " | Admin access enabled" : ""}`;
+
             if (currentUser.isAdmin) {
                 document.getElementById("adminCard").style.display = "block";
+                document.getElementById("adminNav").style.display = "flex";
             }
         }
 
-        function go(type) {
-            if (type === "lie") window.location = "lie.html";
-            if (type === "mood") window.location = "mood.html";
-            if (type === "productivity") window.location = "productivity.html";
-            if (type === "history") window.location = "history.html";
-            if (type === "profile") window.location = "profile.html";
-            if (type === "presentation") window.location = "presentation.html";
-            if (type === "admin") window.location = "admin.html";
+        async function loadOverview() {
+            const response = await authFetch("/summary");
+            const summary = await response.json();
+
+            document.getElementById("dashboardMetrics").innerHTML = `
+                ${createMetricCard("Sessions Logged", summary.totals.sessions, "Total records across all modules")}
+                ${createMetricCard("Average Score", formatPercent(summary.totals.avgScore), "Overall platform-facing behavioral score")}
+                ${createMetricCard("Average Confidence", formatPercent(summary.totals.avgConfidence), "How stable and credible recent sessions appear")}
+                ${createMetricCard("Average Hesitation", formatPercent(summary.totals.avgHesitation), "Measured interaction friction across sessions")}
+            `;
         }
+
+        loadOverview().catch(() => {
+            showToast("Could not load dashboard overview.", "error");
+        });
     </script>
 </body>
 </html>

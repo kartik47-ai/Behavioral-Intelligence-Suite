@@ -3,92 +3,143 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Insight Console - Behavioral Response Analysis</title>
+    <title>Insight Console | VeraLens</title>
     <link rel="stylesheet" href="css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="bg">
-    <div class="card wide-card">
-        <div class="hero-row">
-            <div>
-                <span class="eyebrow">Module 04</span>
-                <h2>Insight Console</h2>
-                <p class="subtitle">Session filters, risk heatmap, benchmark comparison, recommendations, and printable summaries.</p>
-            </div>
-            <button class="ghost-btn" onclick="printCurrentView()">Print or save as PDF</button>
-        </div>
+    <div class="page-shell">
+        <main class="main-shell wide-card" style="margin: 0 auto;">
+            <section class="topbar">
+                <div>
+                    <span class="eyebrow">Module 04</span>
+                    <h2>Insight Console</h2>
+                    <p class="subtitle">A professional review surface for trends, baseline shifts, benchmarking, risk heatmaps, and side-by-side session comparison.</p>
+                </div>
+                <div class="split-actions">
+                    <button class="ghost-btn" onclick="navigateTo('dashboard')">Back to dashboard</button>
+                    <button class="ghost-btn" onclick="printCurrentView()">Print current view</button>
+                </div>
+            </section>
 
-        <div class="toolbar filter-grid">
-            <select id="moduleFilter">
-                <option value="all">All modules</option>
-                <option value="lie">Response authenticity</option>
-                <option value="mood">Mood mapping</option>
-                <option value="productivity">Productivity signals</option>
-            </select>
-            <select id="difficultyFilter">
-                <option value="all">All difficulties</option>
-                <option value="easy">Easy</option>
-                <option value="standard">Standard</option>
-                <option value="high-pressure">High pressure</option>
-            </select>
-            <input id="startDate" type="date">
-            <input id="endDate" type="date">
-            <input id="minScore" type="number" min="0" max="100" placeholder="Min score">
-            <label class="checkbox-row">
-                <input id="highRiskOnly" type="checkbox">
-                High risk only
-            </label>
-            <button class="ghost-btn" onclick="loadDashboard()">Apply filters</button>
-        </div>
+            <section class="panel">
+                <div class="panel-head">
+                    <div>
+                        <span class="eyebrow">Filters</span>
+                        <h3>Refine session evidence</h3>
+                    </div>
+                </div>
+                <div class="filter-grid">
+                    <label>Module
+                        <select id="moduleFilter">
+                            <option value="all">All modules</option>
+                            <option value="lie">Response authenticity</option>
+                            <option value="mood">Mood mapping</option>
+                            <option value="productivity">Productivity signals</option>
+                        </select>
+                    </label>
+                    <label>Difficulty
+                        <select id="difficultyFilter">
+                            <option value="all">All difficulties</option>
+                            <option value="easy">Easy</option>
+                            <option value="standard">Standard</option>
+                            <option value="high-pressure">High pressure</option>
+                        </select>
+                    </label>
+                    <label>Start date
+                        <input id="startDate" type="date">
+                    </label>
+                    <label>End date
+                        <input id="endDate" type="date">
+                    </label>
+                    <label>Minimum score
+                        <input id="minScore" type="number" min="0" max="100" placeholder="0-100">
+                    </label>
+                    <label class="checkbox-row">High risk only
+                        <input id="highRiskOnly" type="checkbox">
+                    </label>
+                    <button class="ghost-btn" onclick="loadDashboard()">Apply filters</button>
+                </div>
+            </section>
 
-        <div class="metrics-grid" id="summaryCards"></div>
+            <section class="metrics-grid" id="summaryCards"></section>
 
-        <div class="chart-grid">
-            <div class="panel">
-                <h3>Score trend</h3>
-                <canvas id="trendChart"></canvas>
-            </div>
-            <div class="panel">
-                <h3>Module averages</h3>
-                <canvas id="moduleChart"></canvas>
-            </div>
-        </div>
+            <section class="chart-grid">
+                <div class="panel chart-panel">
+                    <div class="panel-head">
+                        <div>
+                            <span class="eyebrow">Trendline</span>
+                            <h3>Score trajectory</h3>
+                        </div>
+                    </div>
+                    <canvas id="trendChart" class="fixed-chart"></canvas>
+                </div>
+                <div class="panel chart-panel">
+                    <div class="panel-head">
+                        <div>
+                            <span class="eyebrow">Composition</span>
+                            <h3>Module averages</h3>
+                        </div>
+                    </div>
+                    <canvas id="moduleChart" class="fixed-chart"></canvas>
+                </div>
+            </section>
 
-        <div class="chart-grid">
-            <div class="panel">
-                <h3>Risk heatmap</h3>
-                <div id="heatmapList" class="heatmap-grid"></div>
-            </div>
-            <div class="panel">
-                <h3>Benchmark</h3>
-                <div id="benchmarkBox" class="panel-list"></div>
-            </div>
-        </div>
+            <section class="chart-grid">
+                <div class="panel">
+                    <h3>Risk heatmap</h3>
+                    <div id="heatmapList" class="heatmap-grid"></div>
+                </div>
+                <div class="panel">
+                    <h3>Benchmark positioning</h3>
+                    <div id="benchmarkBox" class="panel-list"></div>
+                </div>
+            </section>
 
-        <div class="chart-grid">
-            <div class="panel">
-                <h3>Correlations</h3>
-                <div id="correlationList" class="panel-list"></div>
-            </div>
-            <div class="panel">
-                <h3>Recommendations</h3>
-                <div id="recommendationList" class="panel-list"></div>
-            </div>
-        </div>
+            <section class="chart-grid">
+                <div class="panel">
+                    <h3>Correlation narratives</h3>
+                    <div id="correlationList" class="panel-list"></div>
+                </div>
+                <div class="panel">
+                    <h3>Recommendations</h3>
+                    <div id="recommendationList" class="panel-list"></div>
+                </div>
+            </section>
 
-        <div class="panel">
-            <h3>Session comparison</h3>
-            <p class="mini-copy">Select up to two sessions below, then compare score, confidence, hesitation, and consistency.</p>
-            <button class="ghost-btn" onclick="compareSelected()">Compare selected sessions</button>
-            <div id="comparisonBox" class="panel-list"></div>
-        </div>
+            <section class="chart-grid">
+                <div class="panel">
+                    <h3>Baseline profile</h3>
+                    <div id="baselineBox" class="panel-list"></div>
+                </div>
+                <div class="panel">
+                    <h3>Standout moments</h3>
+                    <div id="topMoments" class="timeline-list"></div>
+                </div>
+            </section>
 
-        <div class="panel">
-            <h3>Session log</h3>
-            <div id="sessionList" class="session-list"></div>
-        </div>
+            <section class="panel">
+                <div class="panel-head">
+                    <div>
+                        <span class="eyebrow">Comparison</span>
+                        <h3>Compare two sessions</h3>
+                    </div>
+                    <button class="ghost-btn" onclick="compareSelected()">Compare selected sessions</button>
+                </div>
+                <p class="mini-copy">Select up to two sessions from the log below to compare changes in score, confidence, hesitation, and consistency.</p>
+                <div id="comparisonBox" class="panel-list" style="margin-top: 16px;"></div>
+            </section>
 
-        <button class="back-btn" onclick="window.location='dashboard.html'">Back to dashboard</button>
+            <section class="panel">
+                <div class="panel-head">
+                    <div>
+                        <span class="eyebrow">Evidence Log</span>
+                        <h3>Session archive</h3>
+                    </div>
+                </div>
+                <div id="sessionList" class="session-list"></div>
+            </section>
+        </main>
     </div>
 
     <script src="js/app.js"></script>
@@ -129,19 +180,21 @@
 
         function renderSummary() {
             document.getElementById("summaryCards").innerHTML = `
-                <div class="metric-card"><span>Total sessions</span><strong>${summaryState.totals.sessions}</strong></div>
-                <div class="metric-card"><span>Average score</span><strong>${summaryState.totals.avgScore}%</strong></div>
-                <div class="metric-card"><span>Average confidence</span><strong>${summaryState.totals.avgConfidence}%</strong></div>
-                <div class="metric-card"><span>Average hesitation</span><strong>${summaryState.totals.avgHesitation}%</strong></div>
+                ${createMetricCard("Total Sessions", summaryState.totals.sessions, "Records across all modules")}
+                ${createMetricCard("Average Score", formatPercent(summaryState.totals.avgScore), "Aggregate behavioral score")}
+                ${createMetricCard("Average Confidence", formatPercent(summaryState.totals.avgConfidence), "Stability across recent sessions")}
+                ${createMetricCard("Average Hesitation", formatPercent(summaryState.totals.avgHesitation), "Measured interaction friction")}
             `;
 
-            document.getElementById("correlationList").innerHTML = summaryState.correlations.length
-                ? summaryState.correlations.map((item) => `<div class="list-item">${item}</div>`).join("")
-                : `<div class="list-item">No correlation insight yet.</div>`;
+            document.getElementById("correlationList").innerHTML = createListItems(
+                summaryState.correlations,
+                (item) => `<div class="list-item">${item}</div>`
+            );
 
-            document.getElementById("recommendationList").innerHTML = summaryState.recommendations.length
-                ? summaryState.recommendations.map((item) => `<div class="list-item">${item}</div>`).join("")
-                : `<div class="list-item">No recommendations available yet.</div>`;
+            document.getElementById("recommendationList").innerHTML = createListItems(
+                summaryState.recommendations,
+                (item) => `<div class="list-item">${item}</div>`
+            );
 
             document.getElementById("heatmapList").innerHTML = summaryState.heatmap.length
                 ? summaryState.heatmap.map((item) => `
@@ -150,26 +203,34 @@
                         <strong>${item.risk}%</strong>
                     </div>
                 `).join("")
-                : `<div class="list-item">No category heatmap available.</div>`;
+                : `<div class="empty-state"><strong>No heatmap available</strong><p class="empty-copy">Run more sessions to generate category-level heat.</p></div>`;
 
             document.getElementById("benchmarkBox").innerHTML = `
-                <div class="list-item">Your average score: ${benchmarkState.ownAverage}%</div>
-                <div class="list-item">Platform average: ${benchmarkState.globalAverage}%</div>
-                <div class="list-item">Platform confidence average: ${benchmarkState.confidenceAverage}%</div>
-                <div class="list-item">Estimated percentile: ${benchmarkState.percentile}%</div>
+                <div class="list-item">Your average score: <strong>${benchmarkState.ownAverage}%</strong></div>
+                <div class="list-item">Platform average: <strong>${benchmarkState.globalAverage}%</strong></div>
+                <div class="list-item">Confidence average: <strong>${benchmarkState.confidenceAverage}%</strong></div>
+                <div class="list-item">Estimated percentile: <strong>${benchmarkState.percentile}%</strong></div>
                 <div class="list-item">${benchmarkState.label}</div>
             `;
-        }
 
-        function chartOptions() {
-            return {
-                responsive: true,
-                plugins: { legend: { labels: { color: "#dceeff" } } },
-                scales: {
-                    x: { ticks: { color: "#dceeff" }, grid: { color: "rgba(255,255,255,0.08)" } },
-                    y: { ticks: { color: "#dceeff" }, grid: { color: "rgba(255,255,255,0.08)" }, beginAtZero: true, max: 100 }
-                }
-            };
+            document.getElementById("baselineBox").innerHTML = createListItems(
+                summaryState.baselineProfile,
+                (item) => `<div class="list-item">
+                    <strong>${formatModuleName(item.module)}</strong>
+                    <p>Baseline ${item.baselineScore}% | Current ${item.currentScore}% | Delta ${item.delta > 0 ? "+" : ""}${item.delta}</p>
+                    <p>${item.status}</p>
+                </div>`
+            );
+
+            document.getElementById("topMoments").innerHTML = createListItems(
+                summaryState.topMoments,
+                (item) => `<article class="timeline-item">
+                    <time>${formatTimestamp(item.timestamp)}</time>
+                    <strong>${formatModuleName(item.module)}</strong>
+                    <p>${item.headline}</p>
+                    <p>Score ${item.score}% | Confidence ${item.confidence}% | Hesitation ${item.hesitation}%</p>
+                </article>`
+            );
         }
 
         function renderCharts() {
@@ -184,17 +245,22 @@
                     datasets: [{
                         label: "Session score",
                         data: trendScores,
-                        borderColor: "#26c2ff",
-                        backgroundColor: "rgba(38,194,255,0.2)",
-                        tension: 0.3,
+                        borderColor: "#9fe870",
+                        backgroundColor: "rgba(159, 232, 112, 0.16)",
+                        tension: 0.32,
                         fill: true
                     }]
                 },
-                options: chartOptions()
+                options: baseChartOptions({
+                    scales: {
+                        x: { ticks: { color: chartTextColor() }, grid: { color: chartGridColor() } },
+                        y: { beginAtZero: true, max: 100, ticks: { color: chartTextColor() }, grid: { color: chartGridColor() } }
+                    }
+                })
             });
 
             const moduleAverages = summaryState.moduleAverages || {};
-            const moduleLabels = Object.keys(moduleAverages).map(formatModule);
+            const moduleLabels = Object.keys(moduleAverages).map(formatModuleName);
             const moduleScores = Object.values(moduleAverages).map((item) => item.score);
 
             if (moduleChart) moduleChart.destroy();
@@ -202,22 +268,34 @@
                 type: "doughnut",
                 data: {
                     labels: moduleLabels,
-                    datasets: [{ data: moduleScores, backgroundColor: ["#29c6ff", "#18d39b", "#ffb347"] }]
+                    datasets: [{
+                        data: moduleScores,
+                        backgroundColor: ["#9fe870", "#65d6d3", "#ffcb73"],
+                        borderColor: "rgba(8, 19, 24, 0.9)"
+                    }]
                 },
-                options: chartOptions()
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: chartTextColor(), usePointStyle: true }
+                        }
+                    }
+                }
             });
         }
 
         function renderSessions() {
             document.getElementById("sessionList").innerHTML = allRows.length
                 ? allRows.map((row) => `
-                    <div class="session-item">
+                    <article class="session-item">
                         <div class="session-head">
                             <label class="compare-check">
                                 <input type="checkbox" class="compareBox" value="${row.id}">
-                                <strong>${formatModule(row.module)}</strong>
+                                <strong>${formatModuleName(row.module)}</strong>
                             </label>
-                            <span>${new Date(row.timestamp).toLocaleString()}</span>
+                            <span>${formatTimestamp(row.timestamp)}</span>
                         </div>
                         <p>${row.summary || "No summary available."}</p>
                         <div class="session-tags">
@@ -228,15 +306,15 @@
                             <span>Difficulty ${row.difficulty}</span>
                         </div>
                         ${row.flagged_questions.length ? `<div class="session-flag-box">${row.flagged_questions.map((flag) => `<div>${flag.question}: ${flag.reason}</div>`).join("")}</div>` : ""}
-                    </div>
+                    </article>
                 `).join("")
-                : `<div class="list-item">No sessions match the current filters.</div>`;
+                : `<div class="empty-state"><strong>No sessions match these filters</strong><p class="empty-copy">Adjust your filters or run new module sessions.</p></div>`;
         }
 
         async function compareSelected() {
             const ids = [...document.querySelectorAll(".compareBox:checked")].map((item) => item.value).slice(0, 2);
             if (ids.length < 2) {
-                alert("Select two sessions to compare.");
+                showToast("Select two sessions to compare.", "error");
                 return;
             }
 
@@ -249,15 +327,9 @@
                     <div class="list-item">Confidence delta: ${data.deltas.confidence > 0 ? "+" : ""}${data.deltas.confidence || 0}</div>
                     <div class="list-item">Hesitation delta: ${data.deltas.hesitation > 0 ? "+" : ""}${data.deltas.hesitation || 0}</div>
                     <div class="list-item">Consistency delta: ${data.deltas.consistency > 0 ? "+" : ""}${data.deltas.consistency || 0}</div>
-                    ${data.rows.map((row) => `<div class="list-item">${formatModule(row.module)} | ${new Date(row.timestamp).toLocaleString()} | ${row.score}%</div>`).join("")}
+                    ${data.rows.map((row) => `<div class="list-item">${formatModuleName(row.module)} | ${formatTimestamp(row.timestamp)} | ${row.score}%</div>`).join("")}
                 `
                 : `<div class="list-item">Comparison data unavailable.</div>`;
-        }
-
-        function formatModule(module) {
-            if (module === "lie") return "Response Authenticity";
-            if (module === "mood") return "Mood Mapping";
-            return "Productivity Signals";
         }
 
         function printCurrentView() {
@@ -282,7 +354,9 @@
             ]);
         }
 
-        loadDashboard();
+        loadDashboard().catch(() => {
+            showToast("Unable to load the insight console.", "error");
+        });
     </script>
 </body>
 </html>

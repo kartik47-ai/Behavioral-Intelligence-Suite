@@ -3,42 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Behavioral Response Analysis</title>
+    <title>Sign In | VeraLens Behavioral Intelligence</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="bg">
     <div class="orb orb-one"></div>
     <div class="orb orb-two"></div>
+    <div class="orb orb-three"></div>
 
-    <div class="card auth-card" id="loginCard">
-        <span class="eyebrow">Behavioral Analytics Platform</span>
-        <h2>Login</h2>
-        <p class="subtitle">Access protected dashboards, reports, trends, and admin analytics.</p>
+    <main class="auth-shell">
+        <section class="auth-grid wide-card">
+            <aside class="auth-showcase">
+                <div>
+                    <span class="eyebrow">VeraLens Platform</span>
+                    <h1>Behavioral analysis with a sharper, more credible interface.</h1>
+                    <p class="landing-copy">Authenticate securely, run calibrated assessment modules, compare sessions against your baseline, and present polished insight narratives from one workspace.</p>
+                </div>
 
-        <form id="loginForm" class="stack-form">
-            <input id="loginEmail" type="email" placeholder="Email" required>
-            <input id="loginPassword" type="password" placeholder="Password" required>
-            <button type="submit">Open dashboard</button>
-        </form>
+                <div class="auth-showcase-grid">
+                    <article class="auth-stat">
+                        <span>Modules</span>
+                        <strong>3 Core</strong>
+                        <p class="muted-copy">Authenticity, mood, and productivity intelligence.</p>
+                    </article>
+                    <article class="auth-stat">
+                        <span>Reporting</span>
+                        <strong>Explainable</strong>
+                        <p class="muted-copy">Breakdowns, trends, heatmaps, benchmarks, and printable views.</p>
+                    </article>
+                    <article class="auth-stat">
+                        <span>Security</span>
+                        <strong>Session-based</strong>
+                        <p class="muted-copy">Protected access with role-aware admin visibility.</p>
+                    </article>
+                    <article class="auth-stat">
+                        <span>Positioning</span>
+                        <strong>Professional</strong>
+                        <p class="muted-copy">A behavioral intelligence product, not a gimmick.</p>
+                    </article>
+                </div>
+            </aside>
 
-        <p class="switch-copy">New here? <a href="#" onclick="showRegister()">Create an account</a></p>
-    </div>
+            <section class="auth-panel" id="loginCard">
+                <span class="eyebrow">Access Workspace</span>
+                <h2>Sign in</h2>
+                <p class="subtitle">Enter the protected analytics workspace for live modules, personal trends, and review-ready reports.</p>
 
-    <div class="card auth-card" id="registerCard" style="display:none;">
-        <span class="eyebrow">Create Profile</span>
-        <h2>Register</h2>
-        <p class="subtitle">The first account becomes the admin for platform-wide analytics.</p>
+                <form id="loginForm" class="stack-form">
+                    <label>Email
+                        <input id="loginEmail" type="email" placeholder="name@example.com" required>
+                    </label>
+                    <label>Password
+                        <input id="loginPassword" type="password" placeholder="Enter password" required>
+                    </label>
+                    <button type="submit">Open command center</button>
+                </form>
 
-        <form id="registerForm" class="stack-form">
-            <input id="regName" placeholder="Full name" required>
-            <input id="regEmail" type="email" placeholder="Email" required>
-            <input id="regPhone" placeholder="Phone" required>
-            <input id="regPassword" type="password" placeholder="Password" required>
-            <button type="submit">Create account</button>
-        </form>
+                <p class="switch-copy">New here? <a href="#" onclick="showRegister(); return false;">Create an account</a></p>
+            </section>
 
-        <p class="switch-copy">Already registered? <a href="#" onclick="showLogin()">Go to login</a></p>
-    </div>
+            <section class="auth-panel" id="registerCard" style="display:none;">
+                <span class="eyebrow">Create Access</span>
+                <h2>Register</h2>
+                <p class="subtitle">Create your account. The first registered account receives admin privileges for platform oversight.</p>
+
+                <form id="registerForm" class="stack-form">
+                    <label>Full name
+                        <input id="regName" placeholder="Enter full name" required>
+                    </label>
+                    <label>Email
+                        <input id="regEmail" type="email" placeholder="name@example.com" required>
+                    </label>
+                    <label>Phone
+                        <input id="regPhone" placeholder="Enter phone number" required>
+                    </label>
+                    <label>Password
+                        <input id="regPassword" type="password" placeholder="Create password" required>
+                    </label>
+                    <button type="submit">Create account</button>
+                </form>
+
+                <p class="switch-copy">Already registered? <a href="#" onclick="showLogin(); return false;">Return to sign in</a></p>
+            </section>
+        </section>
+    </main>
 
     <script src="js/app.js"></script>
     <script>
@@ -56,7 +104,7 @@
             const password = document.getElementById("loginPassword").value.trim();
 
             if (!email || !password) {
-                alert("Please enter both email and password.");
+                showToast("Please enter both email and password.", "error");
                 return;
             }
 
@@ -67,7 +115,7 @@
             });
 
             const data = await response.json();
-            alert(data.message);
+            showToast(data.message, data.success ? "success" : "error");
 
             if (data.success) {
                 saveCurrentUser({
@@ -90,7 +138,7 @@
             };
 
             if (!payload.name || !payload.email || !payload.phone || !payload.password) {
-                alert("All fields are required.");
+                showToast("All fields are required.", "error");
                 return;
             }
 
@@ -101,7 +149,7 @@
             });
 
             const data = await response.json();
-            alert(data.message);
+            showToast(data.message, data.success ? "success" : "error");
             if (data.success) {
                 document.getElementById("registerForm").reset();
                 showLogin();

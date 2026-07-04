@@ -3,30 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mood Mapping - Behavioral Response Analysis</title>
+    <title>Mood Mapping | VeraLens</title>
     <link rel="stylesheet" href="css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="bg">
-    <div class="card wide-card">
-        <div class="hero-row">
-            <div>
-                <span class="eyebrow">Module 02</span>
-                <h2>Mood Mapping</h2>
-                <p class="subtitle">Capture the emotional tone behind your sessions and compare it with confidence patterns.</p>
-            </div>
-            <button class="ghost-btn" onclick="window.location='dashboard.html'">Back</button>
-        </div>
+    <div class="page-shell">
+        <main class="main-shell wide-card" style="margin: 0 auto;">
+            <section class="topbar">
+                <div>
+                    <span class="eyebrow">Module 02</span>
+                    <h2>Mood Mapping</h2>
+                    <p class="subtitle">Capture emotional context before or after assessment sessions to understand whether strain, calmness, or energy may be influencing behavioral patterns.</p>
+                </div>
+                <button class="ghost-btn" onclick="navigateTo('dashboard')">Back to dashboard</button>
+            </section>
 
-        <div id="moodQuestions" class="stacked-question-list"></div>
-        <button onclick="submitMood()">Analyze mood profile</button>
+            <section class="hero-panel">
+                <div class="hero-row">
+                    <div class="hero-content">
+                        <span class="eyebrow">Context Layer</span>
+                        <h3>Emotional context improves interpretation.</h3>
+                        <p class="muted-copy">This module gives your later reports more credibility by showing whether hesitation may be linked to emotional load rather than deceptive intent alone.</p>
+                    </div>
+                    <div class="pill-row">
+                        <span class="insight-pill">Self-report module</span>
+                        <span class="insight-pill insight-success">Contextual analytics</span>
+                        <span class="insight-pill insight-warning">Risk moderation</span>
+                    </div>
+                </div>
+            </section>
 
-        <div id="moodResult" class="result-container" style="display:none;">
-            <div class="metrics-grid" id="moodMetrics"></div>
-            <canvas id="moodChart" class="result-chart"></canvas>
-            <div id="moodSummary"></div>
-            <button class="ghost-btn" onclick="printMoodReport()">Print or save as PDF</button>
-        </div>
+            <section id="moodQuestions" class="stacked-question-list"></section>
+            <button onclick="submitMood()">Analyze mood profile</button>
+
+            <section id="moodResult" class="result-container" style="display:none;">
+                <div class="metrics-grid" id="moodMetrics"></div>
+                <div class="panel chart-panel" style="margin-top: 18px;">
+                    <canvas id="moodChart" class="result-chart"></canvas>
+                </div>
+                <div id="moodSummary"></div>
+                <button class="ghost-btn" onclick="printMoodReport()" style="margin-top: 18px;">Print or save as PDF</button>
+            </section>
+        </main>
     </div>
 
     <script src="js/app.js"></script>
@@ -86,7 +105,7 @@
 
         async function submitMood() {
             if (responseState.some((item) => !item.answer)) {
-                alert("Please answer all mood prompts.");
+                showToast("Please answer all mood prompts.", "error");
                 return;
             }
 
@@ -106,12 +125,12 @@
 
             document.getElementById("moodResult").style.display = "block";
             document.getElementById("moodMetrics").innerHTML = `
-                <div class="metric-card"><span>Emotional score</span><strong>${data.score}%</strong></div>
-                <div class="metric-card"><span>Confidence</span><strong>${data.confidence}%</strong></div>
-                <div class="metric-card"><span>Hesitation risk</span><strong>${data.hesitation}%</strong></div>
-                <div class="metric-card"><span>Profile</span><strong>${data.label}</strong></div>
+                ${createMetricCard("Emotional Score", formatPercent(data.score), "Overall emotional steadiness")}
+                ${createMetricCard("Confidence", formatPercent(data.confidence), "Self-report clarity and stability")}
+                ${createMetricCard("Hesitation Risk", formatPercent(data.hesitation), "Potential emotional drag on later sessions")}
+                ${createMetricCard("Profile", data.label, "High-level emotional classification")}
             `;
-            document.getElementById("moodSummary").innerHTML = `<p class="feedback">${data.summary}</p>`;
+            document.getElementById("moodSummary").innerHTML = `<div class="panel" style="margin-top: 18px;"><p>${data.summary}</p></div>`;
 
             if (moodChart) moodChart.destroy();
             moodChart = new Chart(document.getElementById("moodChart"), {
@@ -121,23 +140,25 @@
                     datasets: [{
                         label: "Mood profile",
                         data: [data.score, data.confidence, 100 - data.hesitation, data.consistency],
-                        backgroundColor: "rgba(24, 179, 255, 0.2)",
-                        borderColor: "#22c1ff",
+                        backgroundColor: "rgba(101, 214, 211, 0.18)",
+                        borderColor: "#65d6d3",
                         borderWidth: 2
                     }]
                 },
                 options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
                     scales: {
                         r: {
-                            angleLines: { color: "rgba(255,255,255,0.15)" },
-                            grid: { color: "rgba(255,255,255,0.15)" },
-                            pointLabels: { color: "#dceeff" },
-                            ticks: { backdropColor: "transparent", color: "#9bc6e6" },
+                            angleLines: { color: chartGridColor() },
+                            grid: { color: chartGridColor() },
+                            pointLabels: { color: chartTextColor() },
+                            ticks: { backdropColor: "transparent", color: chartTextColor() },
                             suggestedMin: 0,
                             suggestedMax: 100
                         }
                     },
-                    plugins: { legend: { labels: { color: "#dceeff" } } }
+                    plugins: { legend: { labels: { color: chartTextColor() } } }
                 }
             });
         }

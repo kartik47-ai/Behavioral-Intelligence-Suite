@@ -3,32 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Profile - Behavioral Response Analysis</title>
+    <title>Profile Intelligence | VeraLens</title>
     <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="bg">
-    <div class="card wide-card">
-        <div class="hero-row">
-            <div>
-                <span class="eyebrow">Module 05</span>
-                <h2>User Profile</h2>
-                <p class="subtitle">Your baseline metrics, benchmark standing, recent sessions, and action recommendations.</p>
-            </div>
-            <button class="ghost-btn" onclick="window.location='dashboard.html'">Back</button>
-        </div>
+    <div class="page-shell">
+        <main class="main-shell wide-card" style="margin: 0 auto;">
+            <section class="topbar">
+                <div>
+                    <span class="eyebrow">Module 05</span>
+                    <h2>Profile Intelligence</h2>
+                    <p class="subtitle">Your personal command view for baseline movement, weekly activity, standout moments, and recommendation tracks.</p>
+                </div>
+                <button class="ghost-btn" onclick="navigateTo('dashboard')">Back to dashboard</button>
+            </section>
 
-        <div class="metrics-grid" id="profileMetrics"></div>
+            <section class="metrics-grid" id="profileMetrics"></section>
 
-        <div class="chart-grid">
-            <div class="panel">
-                <h3>Recommendations</h3>
-                <div id="recommendationList" class="panel-list"></div>
-            </div>
-            <div class="panel">
+            <section class="chart-grid">
+                <div class="panel">
+                    <h3>Recommendations</h3>
+                    <div id="recommendationList" class="panel-list"></div>
+                </div>
+                <div class="panel chart-panel">
+                    <h3>Weekly activity</h3>
+                    <canvas id="activityChart" class="fixed-chart"></canvas>
+                </div>
+            </section>
+
+            <section class="chart-grid">
+                <div class="panel">
+                    <h3>Baseline profile</h3>
+                    <div id="baselineList" class="panel-list"></div>
+                </div>
+                <div class="panel">
+                    <h3>Standout moments</h3>
+                    <div id="topMomentList" class="timeline-list"></div>
+                </div>
+            </section>
+
+            <section class="panel">
                 <h3>Recent sessions</h3>
                 <div id="recentSessions" class="panel-list"></div>
-            </div>
-        </div>
+            </section>
+        </main>
     </div>
 
     <script src="js/app.js"></script>
@@ -36,34 +55,94 @@
         const currentUser = requireAuth();
         if (currentUser) startSessionWatch();
 
+        let activityChart;
+
         async function loadProfile() {
             const response = await authFetch("/profile-summary");
             const data = await response.json();
 
             document.getElementById("profileMetrics").innerHTML = `
-                <div class="metric-card"><span>Name</span><strong>${data.user.name}</strong></div>
-                <div class="metric-card"><span>Sessions logged</span><strong>${data.streak}</strong></div>
-                <div class="metric-card"><span>Your average</span><strong>${data.benchmark.ownAverage}%</strong></div>
-                <div class="metric-card"><span>Platform average</span><strong>${data.benchmark.platformAverage}%</strong></div>
+                ${createMetricCard("Profile Owner", data.user.name, data.user.email)}
+                ${createMetricCard("Sessions Logged", data.streak, "Records captured across your workspace")}
+                ${createMetricCard("Your Average", formatPercent(data.benchmark.ownAverage), "Current overall behavioral score")}
+                ${createMetricCard("Platform Average", formatPercent(data.benchmark.platformAverage), "Reference point for comparison")}
             `;
 
-            const modules = data.moduleAverages || {};
-            const moduleItems = Object.keys(modules).length
-                ? Object.entries(modules).map(([key, value]) => `<div class="list-item">${key}: score ${value.score}% | confidence ${value.confidence}%</div>`).join("")
+            const moduleItems = Object.keys(data.moduleAverages || {}).length
+                ? Object.entries(data.moduleAverages).map(([key, value]) => `
+                    <div class="list-item">
+                        <strong>${formatModuleName(key)}</strong>
+                        <p>Score ${value.score}% | Confidence ${value.confidence}% | Hesitation ${value.hesitation}%</p>
+                    </div>
+                `).join("")
                 : `<div class="list-item">No module averages available yet.</div>`;
 
             document.getElementById("recommendationList").innerHTML = `
-                ${data.recommendations.map((item) => `<div class="list-item">${item}</div>`).join("")}
+                ${createListItems(data.recommendations, (item) => `<div class="list-item">${item}</div>`)}
                 <div class="list-item"><strong>Module baselines</strong></div>
                 ${moduleItems}
             `;
 
+            document.getElementById("baselineList").innerHTML = createListItems(
+                data.baselineProfile,
+                (item) => `<div class="list-item">
+                    <strong>${formatModuleName(item.module)}</strong>
+                    <p>Baseline ${item.baselineScore}% | Current ${item.currentScore}% | Delta ${item.delta > 0 ? "+" : ""}${item.delta}</p>
+                    <p>${item.status}</p>
+                </div>`
+            );
+
+            document.getElementById("topMomentList").innerHTML = createListItems(
+                data.topMoments,
+                (item) => `<article class="timeline-item">
+                    <time>${formatTimestamp(item.timestamp)}</time>
+                    <strong>${formatModuleName(item.module)}</strong>
+                    <p>${item.headline}</p>
+                    <p>Score ${item.score}% | Confidence ${item.confidence}%</p>
+                </article>`
+            );
+
             document.getElementById("recentSessions").innerHTML = data.recentSessions.length
-                ? data.recentSessions.map((row) => `<div class="list-item">${row.module} | ${row.score}% | ${new Date(row.timestamp).toLocaleString()}</div>`).join("")
+                ? data.recentSessions.map((row) => `
+                    <div class="list-item">
+                        <strong>${formatModuleName(row.module)}</strong>
+                        <p>${formatTimestamp(row.timestamp)}</p>
+                        <p>Score ${row.score}% | Confidence ${row.confidence}% | Hesitation ${row.hesitation}%</p>
+                    </div>
+                `).join("")
                 : `<div class="list-item">No recent sessions yet.</div>`;
+
+            renderActivity(data.weeklyActivity || []);
         }
 
-        loadProfile();
+        function renderActivity(activity) {
+            if (activityChart) activityChart.destroy();
+            activityChart = new Chart(document.getElementById("activityChart"), {
+                type: "bar",
+                data: {
+                    labels: activity.map((item) => item.day),
+                    datasets: [{
+                        label: "Average score",
+                        data: activity.map((item) => item.averageScore),
+                        backgroundColor: "#65d6d3"
+                    }, {
+                        label: "Sessions",
+                        data: activity.map((item) => item.sessions * 10),
+                        backgroundColor: "#9fe870"
+                    }]
+                },
+                options: baseChartOptions({
+                    scales: {
+                        x: { ticks: { color: chartTextColor() }, grid: { color: chartGridColor() } },
+                        y: { beginAtZero: true, max: 100, ticks: { color: chartTextColor() }, grid: { color: chartGridColor() } }
+                    }
+                })
+            });
+        }
+
+        loadProfile().catch(() => {
+            showToast("Unable to load profile intelligence.", "error");
+        });
     </script>
 </body>
 </html>

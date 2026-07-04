@@ -315,44 +315,73 @@ function renderMetricCards(data) {
 
 function renderResultText(data, timeTaken) {
   const flags = data.flaggedQuestions.length
-    ? data.flaggedQuestions.map((item) => `<div class="list-item">${item.category}: ${item.reason}</div>`).join("")
+    ? data.flaggedQuestions.map((item) => `
+        <div class="list-item">
+          <strong>${item.category}</strong>
+          <p>${item.reason}</p>
+          <p>${item.question}</p>
+        </div>
+      `).join("")
     : `<div class="list-item">No high-risk questions were flagged in this session.</div>`;
 
   const categories = data.categoryBreakdown.length
-    ? data.categoryBreakdown.map((item) => `<div class="list-item">${item.category} - risk ${item.risk}% | avg time ${item.avgTime}s</div>`).join("")
+    ? data.categoryBreakdown.map((item) => `
+        <div class="list-item">
+          <strong>${item.category}</strong>
+          <p>Risk ${item.risk}% | Average time ${item.avgTime}s</p>
+        </div>
+      `).join("")
     : `<div class="list-item">No category data available.</div>`;
 
   const recommendations = (data.recommendations || [])
     .map((item) => `<div class="list-item">${item}</div>`)
     .join("");
 
+  const sessionNotes = generatedFollowUps.length
+    ? generatedFollowUps.map((item) => `<div class="list-item">${item.text}</div>`).join("")
+    : `<div class="list-item">No adaptive follow-up prompts were needed in this session.</div>`;
+
   document.getElementById("resultText").innerHTML = `
-    <div class="detailed-analysis">
-      <h4>Explainable scoring</h4>
-      <p>Total session time: ${Math.round(timeTaken)} seconds</p>
-      <p>Difficulty: ${data.analysis.difficulty}</p>
-      <p>Formula: 100 - time penalty - change penalty - hover penalty - pattern penalty + consistency bonus</p>
-      <p class="feedback">${data.summary}</p>
-      <div class="analysis-columns">
-        <div>
-          <h4>Breakdown</h4>
-          <div class="panel-list">
-            <div class="list-item">Time penalty: ${data.analysis.timePenalty}%</div>
-            <div class="list-item">Change penalty: ${data.analysis.changePenalty}%</div>
-            <div class="list-item">Hover penalty: ${data.analysis.hoverPenalty}%</div>
-            <div class="list-item">Pattern penalty: ${data.analysis.patternPenalty}%</div>
-            <div class="list-item">Consistency bonus: ${data.analysis.consistencyBonus}%</div>
-          </div>
-        </div>
-        <div>
-          <h4>Flagged prompts</h4>
-          <div class="panel-list">${flags}</div>
+    <div class="detail-grid" style="margin-top: 20px;">
+      <div class="detail-card">
+        <h4>Executive summary</h4>
+        <p>Total session time: ${Math.round(timeTaken)} seconds</p>
+        <p>Difficulty: ${data.analysis.difficulty}</p>
+        <p style="margin-top: 10px;">${data.summary}</p>
+      </div>
+      <div class="detail-card">
+        <h4>Scoring model</h4>
+        <p>Formula: 100 - time penalty - change penalty - hover penalty - pattern penalty + consistency bonus</p>
+        <div class="panel-list" style="margin-top: 14px;">
+          <div class="list-item">Time penalty: ${data.analysis.timePenalty}%</div>
+          <div class="list-item">Change penalty: ${data.analysis.changePenalty}%</div>
+          <div class="list-item">Hover penalty: ${data.analysis.hoverPenalty}%</div>
+          <div class="list-item">Pattern penalty: ${data.analysis.patternPenalty}%</div>
+          <div class="list-item">Consistency bonus: ${data.analysis.consistencyBonus}%</div>
         </div>
       </div>
-      <h4>Category risk</h4>
-      <div class="panel-list">${categories}</div>
-      <h4>Recommendations</h4>
-      <div class="panel-list">${recommendations}</div>
+    </div>
+
+    <div class="analysis-columns" style="margin-top: 18px;">
+      <div class="panel">
+        <h4>Flagged prompts</h4>
+        <div class="panel-list">${flags}</div>
+      </div>
+      <div class="panel">
+        <h4>Adaptive follow-ups used</h4>
+        <div class="panel-list">${sessionNotes}</div>
+      </div>
+    </div>
+
+    <div class="analysis-columns" style="margin-top: 18px;">
+      <div class="panel">
+        <h4>Category risk</h4>
+        <div class="panel-list">${categories}</div>
+      </div>
+      <div class="panel">
+        <h4>Recommendations</h4>
+        <div class="panel-list">${recommendations || `<div class="list-item">No recommendations generated.</div>`}</div>
+      </div>
     </div>
   `;
 }
@@ -370,16 +399,17 @@ function renderChart(data) {
     },
     options: {
       responsive: true,
+      maintainAspectRatio: false,
       plugins: { legend: { display: false } },
       scales: {
         y: {
           beginAtZero: true,
           max: 100,
-          ticks: { color: "#dceeff" },
-          grid: { color: "rgba(255,255,255,0.12)" }
+          ticks: { color: chartTextColor() },
+          grid: { color: chartGridColor() }
         },
         x: {
-          ticks: { color: "#dceeff" },
+          ticks: { color: chartTextColor() },
           grid: { display: false }
         }
       }

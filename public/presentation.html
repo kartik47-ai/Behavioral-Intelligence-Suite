@@ -3,46 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Presentation Mode - Behavioral Response Analysis</title>
+    <title>Presentation Mode | VeraLens</title>
     <link rel="stylesheet" href="css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body class="bg presentation-shell">
-    <div class="card wide-card presentation-card">
-        <div class="hero-row">
-            <div>
-                <span class="eyebrow">Presentation Mode</span>
-                <h2>Behavioral Response Analysis System</h2>
-                <p class="subtitle">A demo-ready view for explaining authentication, scoring, correlations, and user analytics.</p>
-            </div>
-            <div class="toolbar">
-                <button class="ghost-btn" onclick="window.location='dashboard.html'">Back</button>
-                <button class="ghost-btn" onclick="window.print()">Print</button>
-            </div>
-        </div>
-
-        <div class="metrics-grid" id="presentationMetrics"></div>
-
-        <div class="chart-grid">
-            <div class="panel">
-                <h3>What the system measures</h3>
-                <div class="panel-list">
-                    <div class="list-item">Authentication and user-specific protected sessions</div>
-                    <div class="list-item">Authenticity confidence from response timing, answer changes, and consistency</div>
-                    <div class="list-item">Mood and productivity modules to create cross-signal behavioral insights</div>
-                    <div class="list-item">Risk heatmap, recommendation engine, comparison view, and admin analytics</div>
+<body class="bg">
+    <div class="page-shell">
+        <main class="main-shell wide-card" style="margin: 0 auto;">
+            <section class="hero-panel">
+                <div class="hero-row">
+                    <div class="hero-content">
+                        <span class="eyebrow">Presentation Mode</span>
+                        <h2>VeraLens Behavioral Intelligence</h2>
+                        <p class="subtitle">A clean, stakeholder-facing surface for explaining what the platform measures, how the modules connect, and why the output is more professional than a simple lie detector demo.</p>
+                    </div>
+                    <div class="split-actions">
+                        <button class="ghost-btn" onclick="navigateTo('dashboard')">Back</button>
+                        <button class="ghost-btn" onclick="window.print()">Print</button>
+                    </div>
                 </div>
-            </div>
-            <div class="panel">
-                <h3>Module average chart</h3>
-                <canvas id="presentationChart"></canvas>
-            </div>
-        </div>
+            </section>
 
-        <div class="panel">
-            <h3>Talking points</h3>
-            <div id="presentationTalks" class="panel-list"></div>
-        </div>
+            <section class="metrics-grid" id="presentationMetrics"></section>
+
+            <section class="chart-grid">
+                <div class="panel">
+                    <h3>What the system measures</h3>
+                    <div class="panel-list">
+                        <div class="list-item">Protected authentication and role-based access for a credible product workflow.</div>
+                        <div class="list-item">Authenticity estimates from response timing, answer changes, hesitation, and consistency.</div>
+                        <div class="list-item">Mood and productivity modules to contextualize response behavior instead of oversimplifying it.</div>
+                        <div class="list-item">Baseline tracking, benchmark comparison, heatmaps, recommendations, and admin oversight.</div>
+                    </div>
+                </div>
+                <div class="panel chart-panel">
+                    <h3>Module average chart</h3>
+                    <canvas id="presentationChart" class="fixed-chart"></canvas>
+                </div>
+            </section>
+
+            <section class="panel">
+                <h3>Talking points</h3>
+                <div id="presentationTalks" class="panel-list"></div>
+            </section>
+        </main>
     </div>
 
     <script src="js/app.js"></script>
@@ -62,14 +66,14 @@
             const benchmark = await benchmarkRes.json();
 
             document.getElementById("presentationMetrics").innerHTML = `
-                <div class="metric-card"><span>Sessions</span><strong>${summary.totals.sessions}</strong></div>
-                <div class="metric-card"><span>Average score</span><strong>${summary.totals.avgScore}%</strong></div>
-                <div class="metric-card"><span>Average confidence</span><strong>${summary.totals.avgConfidence}%</strong></div>
-                <div class="metric-card"><span>Benchmark percentile</span><strong>${benchmark.percentile}%</strong></div>
+                ${createMetricCard("Sessions", summary.totals.sessions, "Stored across the current user account")}
+                ${createMetricCard("Average Score", formatPercent(summary.totals.avgScore), "Behavioral quality average")}
+                ${createMetricCard("Average Confidence", formatPercent(summary.totals.avgConfidence), "Session stability average")}
+                ${createMetricCard("Benchmark Percentile", formatPercent(benchmark.percentile), benchmark.label)}
             `;
 
             const moduleAverages = summary.moduleAverages || {};
-            const labels = Object.keys(moduleAverages);
+            const labels = Object.keys(moduleAverages).map(formatModuleName);
             const scores = Object.values(moduleAverages).map((item) => item.score);
 
             if (presentationChart) presentationChart.destroy();
@@ -79,36 +83,31 @@
                     labels,
                     datasets: [{
                         data: scores,
-                        backgroundColor: ["#29c6ff", "#18d39b", "#ffb347"]
+                        backgroundColor: ["#9fe870", "#65d6d3", "#ffcb73"]
                     }]
                 },
-                options: {
+                options: baseChartOptions({
+                    plugins: { legend: { display: false } },
                     scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: 100,
-                            ticks: { color: "#dceeff" },
-                            grid: { color: "rgba(255,255,255,0.12)" }
-                        },
-                        x: {
-                            ticks: { color: "#dceeff" },
-                            grid: { display: false }
-                        }
-                    },
-                    plugins: { legend: { display: false } }
-                }
+                        x: { ticks: { color: chartTextColor() }, grid: { display: false } },
+                        y: { beginAtZero: true, max: 100, ticks: { color: chartTextColor() }, grid: { color: chartGridColor() } }
+                    }
+                })
             });
 
             document.getElementById("presentationTalks").innerHTML = [
-                "The project uses session-protected login and role-based admin access.",
-                "It reframes lie detection into a behavioral response analysis problem with measurable features.",
-                "Difficulty levels and adaptive follow-up prompts make the main module more dynamic and research-oriented.",
+                "The platform is intentionally framed as behavioral response analysis, which is more credible than claiming perfect lie detection.",
+                "A protected login, user-specific records, and admin surfaces make the project feel like a complete product rather than a single demo page.",
+                "Authenticity scoring is explainable through timing, hesitation, consistency, and category-specific risk patterns.",
+                "Mood and productivity modules provide context, which reduces simplistic interpretation and improves professionalism.",
                 ...summary.correlations,
                 ...summary.recommendations
             ].map((item) => `<div class="list-item">${item}</div>`).join("");
         }
 
-        loadPresentation();
+        loadPresentation().catch(() => {
+            showToast("Unable to load presentation mode.", "error");
+        });
     </script>
 </body>
 </html>

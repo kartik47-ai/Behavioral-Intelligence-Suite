@@ -365,6 +365,105 @@ function buildHeatmap(rows) {
     .sort((a, b) => b.risk - a.risk);
 }
 
+function buildBaselineProfile(rows) {
+  const modules = ["lie", "mood", "productivity"];
+
+  return modules
+    .map((moduleName) => {
+      const moduleRows = rows.filter((row) => row.module === moduleName);
+      if (!moduleRows.length) {
+        return null;
+      }
+
+      const chronological = moduleRows.slice().reverse();
+      const baselineRows = chronological.slice(0, Math.min(3, chronological.length));
+      const recentRows = moduleRows.slice(0, Math.min(3, moduleRows.length));
+      const baselineScore = Math.round(average(baselineRows.map((row) => row.score)));
+      const currentScore = Math.round(average(recentRows.map((row) => row.score)));
+      const delta = currentScore - baselineScore;
+
+      let status = "Stable";
+      if (delta >= 8) {
+        status = "Above baseline";
+      } else if (delta <= -8) {
+        status = "Below baseline";
+      }
+
+      return {
+        module: moduleName,
+        sessions: moduleRows.length,
+        baselineScore,
+        currentScore,
+        delta,
+        status
+      };
+    })
+    .filter(Boolean);
+}
+
+function buildWeeklyActivity(rows) {
+  const buckets = {};
+
+  rows.forEach((row) => {
+    const dayKey = new Date(row.timestamp).toISOString().slice(0, 10);
+    if (!buckets[dayKey]) {
+      buckets[dayKey] = { day: dayKey, sessions: 0, scoreSum: 0 };
+    }
+    buckets[dayKey].sessions += 1;
+    buckets[dayKey].scoreSum += row.score;
+  });
+
+  return Object.values(buckets)
+    .sort((a, b) => a.day.localeCompare(b.day))
+    .slice(-7)
+    .map((item) => ({
+      day: item.day,
+      sessions: item.sessions,
+      averageScore: Math.round(item.scoreSum / item.sessions)
+    }));
+}
+
+function buildRiskDistribution(rows) {
+  const distribution = {
+    low: 0,
+    guarded: 0,
+    elevated: 0,
+    high: 0
+  };
+
+  rows.forEach((row) => {
+    if (row.hesitation >= 70 || row.flagged_questions.length >= 3 || row.score < 45) {
+      distribution.high += 1;
+    } else if (row.hesitation >= 55 || row.flagged_questions.length >= 1 || row.score < 60) {
+      distribution.elevated += 1;
+    } else if (row.hesitation >= 35 || row.score < 75) {
+      distribution.guarded += 1;
+    } else {
+      distribution.low += 1;
+    }
+  });
+
+  return distribution;
+}
+
+function buildTopMoments(rows) {
+  return rows
+    .filter((row) => row.flagged_questions.length || row.score >= 80)
+    .slice(0, 6)
+    .map((row) => ({
+      id: row.id,
+      module: row.module,
+      score: row.score,
+      confidence: row.confidence,
+      hesitation: row.hesitation,
+      headline:
+        row.flagged_questions.length
+          ? `${row.flagged_questions.length} prompt${row.flagged_questions.length > 1 ? "s were" : " was"} flagged`
+          : "High-confidence session",
+      timestamp: row.timestamp
+    }));
+}
+
 async function saveResult(payload) {
   await dbRun(
     `INSERT INTO results (
@@ -797,7 +896,11 @@ app.get("/summary", authenticate, async (req, res) => {
       correlations: [],
       recentFlags: [],
       heatmap: [],
-      recommendations: []
+      recommendations: [],
+      baselineProfile: [],
+      weeklyActivity: [],
+      riskDistribution: { low: 0, guarded: 0, elevated: 0, high: 0 },
+      topMoments: []
     });
     return;
   }
@@ -829,6 +932,10 @@ app.get("/summary", authenticate, async (req, res) => {
     .slice(0, 8);
   const heatmap = buildHeatmap(rows);
   const recommendations = buildRecommendations({ moduleAverages, correlations, historyRows: rows });
+  const baselineProfile = buildBaselineProfile(rows);
+  const weeklyActivity = buildWeeklyActivity(rows);
+  const riskDistribution = buildRiskDistribution(rows);
+  const topMoments = buildTopMoments(rows);
 
   res.json({
     totals,
@@ -837,7 +944,11 @@ app.get("/summary", authenticate, async (req, res) => {
     correlations,
     recentFlags,
     heatmap,
-    recommendations
+    recommendations,
+    baselineProfile,
+    weeklyActivity,
+    riskDistribution,
+    topMoments
   });
 });
 
@@ -879,6 +990,9 @@ app.get("/profile-summary", authenticate, async (req, res) => {
     recentSessions: rows.slice(0, 5),
     moduleAverages,
     streak: rows.length,
+    baselineProfile: buildBaselineProfile(rows),
+    weeklyActivity: buildWeeklyActivity(rows),
+    topMoments: buildTopMoments(rows),
     benchmark: {
       ownAverage: Math.round(average(rows.map((row) => row.score))),
       platformAverage: Math.round(average(benchmarkRows.map((row) => row.score)))
@@ -934,7 +1048,10 @@ app.get("/admin/overview", authenticate, requireAdmin, async (req, res) => {
     },
     moduleAverages,
     heatmap: buildHeatmap(results),
-    recentSessions: results.slice(0, 10)
+    recentSessions: results.slice(0, 10),
+    weeklyActivity: buildWeeklyActivity(results),
+    riskDistribution: buildRiskDistribution(results),
+    topMoments: buildTopMoments(results)
   });
 });
 

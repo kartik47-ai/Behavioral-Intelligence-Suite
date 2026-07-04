@@ -3,38 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Console - Behavioral Response Analysis</title>
+    <title>Admin Console | VeraLens</title>
     <link rel="stylesheet" href="css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="bg">
-    <div class="card wide-card">
-        <div class="hero-row">
-            <div>
-                <span class="eyebrow">Admin Console</span>
-                <h2>Platform Overview</h2>
-                <p class="subtitle">Inspect user activity, platform averages, flagged sessions, and the global risk heatmap.</p>
-            </div>
-            <button class="ghost-btn" onclick="window.location='dashboard.html'">Back</button>
-        </div>
+    <div class="page-shell">
+        <main class="main-shell wide-card" style="margin: 0 auto;">
+            <section class="topbar">
+                <div>
+                    <span class="eyebrow">Admin Intelligence</span>
+                    <h2>Platform overview</h2>
+                    <p class="subtitle">Inspect user activity, module performance, risk distribution, recent moments, and the global benchmark surface.</p>
+                </div>
+                <button class="ghost-btn" onclick="navigateTo('dashboard')">Back to dashboard</button>
+            </section>
 
-        <div class="metrics-grid" id="adminMetrics"></div>
+            <section class="metrics-grid" id="adminMetrics"></section>
 
-        <div class="chart-grid">
-            <div class="panel">
-                <h3>Platform heatmap</h3>
-                <div id="adminHeatmap" class="heatmap-grid"></div>
-            </div>
-            <div class="panel">
-                <h3>Module averages</h3>
-                <canvas id="adminChart"></canvas>
-            </div>
-        </div>
+            <section class="chart-grid">
+                <div class="panel">
+                    <h3>Platform heatmap</h3>
+                    <div id="adminHeatmap" class="heatmap-grid"></div>
+                </div>
+                <div class="panel chart-panel">
+                    <h3>Module averages</h3>
+                    <canvas id="adminChart" class="fixed-chart"></canvas>
+                </div>
+            </section>
 
-        <div class="panel">
-            <h3>User list</h3>
-            <div id="userList" class="session-list"></div>
-        </div>
+            <section class="chart-grid">
+                <div class="panel chart-panel">
+                    <h3>Weekly activity</h3>
+                    <canvas id="weeklyChart" class="fixed-chart"></canvas>
+                </div>
+                <div class="panel">
+                    <h3>Risk distribution</h3>
+                    <div id="riskDistribution" class="panel-list"></div>
+                </div>
+            </section>
+
+            <section class="chart-grid">
+                <div class="panel">
+                    <h3>Standout platform moments</h3>
+                    <div id="topMoments" class="timeline-list"></div>
+                </div>
+                <div class="panel">
+                    <h3>Recent platform sessions</h3>
+                    <div id="recentSessions" class="panel-list"></div>
+                </div>
+            </section>
+
+            <section class="panel">
+                <h3>User list</h3>
+                <div id="userList" class="session-list"></div>
+            </section>
+        </main>
     </div>
 
     <script src="js/app.js"></script>
@@ -47,6 +71,7 @@
         }
 
         let adminChart;
+        let weeklyChart;
 
         async function loadAdmin() {
             const [overviewRes, usersRes] = await Promise.all([
@@ -58,17 +83,43 @@
             const users = await usersRes.json();
 
             document.getElementById("adminMetrics").innerHTML = `
-                <div class="metric-card"><span>Users</span><strong>${overview.totals.users}</strong></div>
-                <div class="metric-card"><span>Active users</span><strong>${overview.totals.activeUsers}</strong></div>
-                <div class="metric-card"><span>Sessions</span><strong>${overview.totals.sessions}</strong></div>
-                <div class="metric-card"><span>Flagged sessions</span><strong>${overview.totals.flaggedSessions}</strong></div>
+                ${createMetricCard("Users", overview.totals.users, "Registered accounts on the platform")}
+                ${createMetricCard("Active Users", overview.totals.activeUsers, "Users with recorded sessions")}
+                ${createMetricCard("Sessions", overview.totals.sessions, "Total stored module records")}
+                ${createMetricCard("Flagged Sessions", overview.totals.flaggedSessions, "Sessions with elevated risk markers")}
             `;
 
             document.getElementById("adminHeatmap").innerHTML = overview.heatmap.length
                 ? overview.heatmap.map((item) => `<div class="heat-cell"><span>${item.category}</span><strong>${item.risk}%</strong></div>`).join("")
                 : `<div class="list-item">No heatmap available.</div>`;
 
-            const moduleLabels = Object.keys(overview.moduleAverages).map((item) => item);
+            document.getElementById("riskDistribution").innerHTML = `
+                <div class="list-item">Low risk sessions: <strong>${overview.riskDistribution.low}</strong></div>
+                <div class="list-item">Guarded sessions: <strong>${overview.riskDistribution.guarded}</strong></div>
+                <div class="list-item">Elevated sessions: <strong>${overview.riskDistribution.elevated}</strong></div>
+                <div class="list-item">High risk sessions: <strong>${overview.riskDistribution.high}</strong></div>
+            `;
+
+            document.getElementById("topMoments").innerHTML = createListItems(
+                overview.topMoments,
+                (item) => `<article class="timeline-item">
+                    <time>${formatTimestamp(item.timestamp)}</time>
+                    <strong>${formatModuleName(item.module)}</strong>
+                    <p>${item.headline}</p>
+                    <p>Score ${item.score}% | Confidence ${item.confidence}% | Hesitation ${item.hesitation}%</p>
+                </article>`
+            );
+
+            document.getElementById("recentSessions").innerHTML = createListItems(
+                overview.recentSessions,
+                (row) => `<div class="list-item">
+                    <strong>${row.email}</strong>
+                    <p>${formatModuleName(row.module)} | ${formatTimestamp(row.timestamp)}</p>
+                    <p>Score ${row.score}% | Confidence ${row.confidence}%</p>
+                </div>`
+            );
+
+            const moduleLabels = Object.keys(overview.moduleAverages).map((item) => formatModuleName(item));
             const moduleScores = Object.values(overview.moduleAverages).map((item) => item.score);
 
             if (adminChart) adminChart.destroy();
@@ -78,29 +129,43 @@
                     labels: moduleLabels,
                     datasets: [{
                         data: moduleScores,
-                        backgroundColor: ["#29c6ff", "#18d39b", "#ffb347"]
+                        backgroundColor: ["#9fe870", "#65d6d3", "#ffcb73"]
                     }]
                 },
-                options: {
+                options: baseChartOptions({
+                    plugins: { legend: { display: false } },
                     scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: 100,
-                            ticks: { color: "#dceeff" },
-                            grid: { color: "rgba(255,255,255,0.12)" }
-                        },
-                        x: {
-                            ticks: { color: "#dceeff" },
-                            grid: { display: false }
-                        }
-                    },
-                    plugins: { legend: { display: false } }
-                }
+                        x: { ticks: { color: chartTextColor() }, grid: { display: false } },
+                        y: { beginAtZero: true, max: 100, ticks: { color: chartTextColor() }, grid: { color: chartGridColor() } }
+                    }
+                })
+            });
+
+            if (weeklyChart) weeklyChart.destroy();
+            weeklyChart = new Chart(document.getElementById("weeklyChart"), {
+                type: "line",
+                data: {
+                    labels: overview.weeklyActivity.map((item) => item.day),
+                    datasets: [{
+                        label: "Average score",
+                        data: overview.weeklyActivity.map((item) => item.averageScore),
+                        borderColor: "#65d6d3",
+                        backgroundColor: "rgba(101, 214, 211, 0.15)",
+                        fill: true,
+                        tension: 0.35
+                    }]
+                },
+                options: baseChartOptions({
+                    scales: {
+                        x: { ticks: { color: chartTextColor() }, grid: { color: chartGridColor() } },
+                        y: { beginAtZero: true, max: 100, ticks: { color: chartTextColor() }, grid: { color: chartGridColor() } }
+                    }
+                })
             });
 
             document.getElementById("userList").innerHTML = users.length
                 ? users.map((user) => `
-                    <div class="session-item">
+                    <article class="session-item">
                         <div class="session-head">
                             <strong>${user.name}</strong>
                             <span>${user.email}</span>
@@ -111,12 +176,14 @@
                             <span>Avg confidence ${user.avgConfidence}%</span>
                             <span>${user.isAdmin ? "Admin" : "User"}</span>
                         </div>
-                    </div>
+                    </article>
                 `).join("")
                 : `<div class="list-item">No users found.</div>`;
         }
 
-        loadAdmin();
+        loadAdmin().catch(() => {
+            showToast("Unable to load admin console.", "error");
+        });
     </script>
 </body>
 </html>
