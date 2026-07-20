@@ -1,4 +1,4 @@
-# VeraLens Behavioral Intelligence
+# VeraLens Behavioral Intelligence By Kartik Katke
 
 VeraLens is a professional behavioral response analysis platform built with Node.js, Express, SQLite, and a multi-page frontend. It reframes the project away from a simplistic "lie detector" and toward a more credible behavioral intelligence product with explainable scoring, baseline tracking, cross-module context, and admin-grade reporting.
 
