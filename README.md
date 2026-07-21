@@ -1,32 +1,237 @@
-# VeraLens Behavioral Intelligence By Kartik Katke
+# VeraLens – Behavioral Intelligence Platform
 
-VeraLens is a professional behavioral response analysis platform built with Node.js, Express, SQLite, and a multi-page frontend. It reframes the project away from a simplistic "lie detector" and toward a more credible behavioral intelligence product with explainable scoring, baseline tracking, cross-module context, and admin-grade reporting.
+<p align="center">
+  <strong>Behavioral Response Analysis • Explainable Insights • Productivity Intelligence</strong>
+</p>
 
-## Core Experience
+<p align="center">
+  <img src="https://img.shields.io/badge/Node.js-Express-green?style=for-the-badge">
+  <img src="https://img.shields.io/badge/Database-SQLite-blue?style=for-the-badge">
+  <img src="https://img.shields.io/badge/Frontend-HTML%20CSS%20JavaScript-orange?style=for-the-badge">
+  <img src="https://img.shields.io/badge/Status-Active-success?style=for-the-badge">
+  <img src="https://img.shields.io/badge/License-MIT-lightgrey?style=for-the-badge">
+</p>
 
-- Secure registration and login with session-based access
-- Response authenticity assessment with difficulty-aware prompts and adaptive follow-ups
-- Mood mapping and productivity context modules
-- Insight console with filters, trends, comparison, benchmark positioning, and heatmaps
-- Profile intelligence with baseline tracking, weekly activity, and standout moments
-- Admin console for platform-wide oversight
-- Presentation mode for demos, reviews, and stakeholder walkthroughs
+---
 
-## Product Positioning
+## Overview
 
-This project should be interpreted as a behavioral analysis support system. It estimates authenticity-related signals from measurable interaction cues such as timing, hesitation, answer changes, and consistency. It does not claim scientific or definitive lie detection.
+**VeraLens** is a behavioral intelligence platform that analyzes interaction patterns to generate explainable behavioral insights.
+
+Instead of attempting to "detect lies," VeraLens evaluates measurable behavioral signals such as response latency, hesitation, consistency, answer revisions, and contextual behavior to estimate response authenticity and engagement.
+
+The platform is designed for demonstrations, educational research, behavioral analytics, and AI-assisted human interaction studies.
+
+---
+
+## Key Features
+
+### Authentication
+- Secure user registration
+- Session-based login
+- Protected dashboards
+
+### Behavioral Analysis
+- Adaptive behavioral questionnaires
+- Difficulty-aware questions
+- Follow-up prompts
+- Authenticity scoring
+- Confidence estimation
+- Explainable behavioral metrics
+
+### Intelligence Dashboard
+- Real-time analytics
+- Behavioral trends
+- Performance comparisons
+- Weekly insights
+- Interactive charts
+- Heatmaps
+- Benchmark positioning
+
+### Profile Intelligence
+- Personal behavioral baseline
+- Historical activity
+- Progress tracking
+- Highlight moments
+- Consistency monitoring
+
+### Mood & Productivity
+- Mood tracking
+- Productivity assessment
+- Context-aware insights
+- Emotional trend visualization
+
+### Administration
+- User management
+- Platform analytics
+- System monitoring
+- Administrative dashboard
+
+### Presentation Mode
+- Demo-friendly interface
+- Stakeholder presentations
+- Clean reporting views
+
+---
+
+## Technology Stack
+
+### Backend
+
+- Node.js
+- Express.js
+- SQLite
+
+### Frontend
+
+- HTML5
+- CSS3
+- JavaScript
+
+### Charts & Analytics
+
+- Chart.js
+
+---
 
 ## Project Structure
 
-- [server.js](./server.js): Express server, SQLite setup, scoring logic, analytics endpoints
-- [public](./public): Frontend pages, shared styling, and browser-side logic
-- [Behavioral-Response-Analysis-UI.pdf](./Behavioral-Response-Analysis-UI.pdf): Original concept deck
+```
+VeraLens/
+│
+├── public/
+│   ├── css/
+│   ├── js/
+│   ├── images/
+│   ├── pages/
+│   └── assets/
+│
+├── database/
+│
+├── server.js
+├── package.json
+├── package-lock.json
+└── README.md
+```
 
-## Run Locally
+---
+
+## Installation
+
+Clone the repository
+
+```bash
+git clone https://github.com/kartik47-ai/VeraLens.git
+```
+
+Navigate into the project
+
+```bash
+cd VeraLens
+```
+
+Install dependencies
 
 ```bash
 npm install
+```
+
+Start the development server
+
+```bash
 npm start
 ```
 
-Then open `http://localhost:3000`. If port `3000` is already in use, the server automatically retries the next available port.
+Open your browser
+
+```
+http://localhost:3000
+```
+
+If **port 3000** is unavailable, VeraLens automatically starts on the next available port.
+
+---
+
+## Behavioral Scoring
+
+The behavioral scoring engine evaluates multiple observable interaction signals, including:
+
+- Response time
+- Hesitation patterns
+- Answer consistency
+- Revision frequency
+- Question difficulty
+- Contextual behavior
+- Historical baseline
+- Interaction stability
+
+The generated score represents a behavioral estimate rather than factual verification.
+
+---
+
+## Use Cases
+
+- Behavioral research
+- Human-computer interaction studies
+- Educational demonstrations
+- Interview simulations
+- Training environments
+- Productivity analysis
+- AI-assisted behavioral analytics
+
+---
+
+## Important Disclaimer
+
+VeraLens **does not perform scientific or forensic lie detection.**
+
+The platform estimates behavioral authenticity using observable interaction signals and statistical heuristics. Results should be interpreted as supportive behavioral insights and not as definitive judgments or factual verification.
+
+---
+
+## Future Roadmap
+
+- AI-powered behavioral summarization
+- Machine learning personalization
+- Multi-session baseline learning
+- Advanced visualization dashboards
+- Exportable PDF reports
+- Cloud synchronization
+- Multi-user collaboration
+- REST API
+- Mobile application
+- Role-based access control
+
+---
+
+## Contributing
+
+Contributions are welcome.
+
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push the branch
+5. Open a Pull Request
+
+---
+
+## License
+
+This project is licensed under the **MIT License**.
+
+---
+
+## Author
+
+### Kartik Katke
+
+**AI Developer • Full Stack Developer • Behavioral Intelligence Enthusiast**
+
+GitHub: https://github.com/kartik47-ai
+
+---
+
+<p align="center">
+Built with ❤️ using Node.js, Express, SQLite, and JavaScript.
+</p>
